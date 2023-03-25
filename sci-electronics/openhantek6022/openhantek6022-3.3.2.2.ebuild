@@ -23,7 +23,8 @@ DEPEND=">=dev-qt/qtprintsupport-5.4
 	virtual/libusb:1
 	virtual/udev
 "
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	sci-electronics/electronics-menu"
 BDEPEND=">=dev-util/cmake-3.5"
 
 PATCHES=(
