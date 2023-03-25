@@ -1,0 +1,26 @@
+Index: OpenHantek6022-3.3.2.2/cmake/CPackInfos.cmake
+===================================================================
+--- OpenHantek6022-3.3.2.2.orig/cmake/CPackInfos.cmake
++++ OpenHantek6022-3.3.2.2/cmake/CPackInfos.cmake
+@@ -46,7 +46,7 @@ if (UNIX)
+     FILE(GLOB PDF "docs/*.pdf")
+     install(
+         FILES CHANGELOG LICENSE README ${PDF}
+-        DESTINATION share/doc/openhantek
++        DESTINATION share/doc/openhantek6022-3.3.2.2
+     )
+     # install application starter and icons
+     install(
+Index: OpenHantek6022-3.3.2.2/openhantek/src/documents.h
+===================================================================
+--- OpenHantek6022-3.3.2.2.orig/openhantek/src/documents.h
++++ OpenHantek6022-3.3.2.2/openhantek/src/documents.h
+@@ -15,7 +15,7 @@ const QString DocPath = QString( "docume
+ #elif defined( Q_OS_FREEBSD )
+ const QString DocPath = QString( "/usr/local/share/doc/openhantek/" );
+ #else
+-const QString DocPath = QString( "/usr/share/doc/openhantek/" );
++const QString DocPath = QString( "/usr/share/doc/openhantek6022-3.3.2.2/" );
+ #endif
+ 
+ // GitHub doc location

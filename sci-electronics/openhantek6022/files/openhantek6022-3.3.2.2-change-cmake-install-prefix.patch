@@ -1,0 +1,15 @@
+Index: OpenHantek6022-3.3.2.2/CMakeLists.txt
+===================================================================
+--- OpenHantek6022-3.3.2.2.orig/CMakeLists.txt
++++ OpenHantek6022-3.3.2.2/CMakeLists.txt
+@@ -1,6 +1,10 @@
+ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+ project(OpenHantek)
+ 
++IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
++  SET(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "nothing" FORCE)
++ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
++
+ set(OpenGL_GL_PREFERENCE GLVND)
+ 
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
