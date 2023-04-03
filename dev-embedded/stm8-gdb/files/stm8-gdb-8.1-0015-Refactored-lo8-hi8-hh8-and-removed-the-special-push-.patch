@@ -1,0 +1,98 @@
+From 166b8be056093ad4de48ca2e4ae9bd6bd442bd6e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=85ke=20Rehnman?= <ake_rehnman_at_gmail_com>
+Date: Sun, 22 Mar 2020 10:41:03 +0100
+Subject: [PATCH 15/18] Refactored lo8/hi8/hh8 and removed the special push
+ insns.
+
+---
+ gas/config/tc-stm8.c  | 65 ++++++++++++++++++++-----------------------
+ include/opcode/stm8.h |  5 +---
+ opcodes/stm8-dis.c    | 27 ------------------
+ opcodes/stm8-opc.c    |  6 ----
+ 4 files changed, 31 insertions(+), 72 deletions(-)
+
+Index: gdb-8.1/include/opcode/stm8.h
+===================================================================
+--- gdb-8.1.orig/include/opcode/stm8.h
++++ gdb-8.1/include/opcode/stm8.h
+@@ -63,10 +63,7 @@ typedef enum {
+ 	ST8_LONGPTRW_Y,
+ 	ST8_LONGPTRE,
+ 	ST8_LONGPTRE_X,
+-	ST8_LONGPTRE_Y,
+-	ST8_HI8,
+-	ST8_LO8,
+-	ST8_HH8
++	ST8_LONGPTRE_Y
+ } stm8_addr_mode_t;
+ 
+ struct stm8_opcodes_s
+Index: gdb-8.1/opcodes/stm8-dis.c
+===================================================================
+--- gdb-8.1.orig/opcodes/stm8-dis.c
++++ gdb-8.1/opcodes/stm8-dis.c
+@@ -332,33 +332,6 @@ int stm8_operands(char *s, unsigned char
+ 			sprintf(s,"(0x%6.6x,Y)",val);
+ 		return 3;
+ 		break;
+-	case ST8_HI8:
+-		val = buf[0];
+-		sym = find_symbol(val);
+-		if (sym)
+-			sprintf(s,"hi8(#%s)",sym);
+-		else
+-			sprintf(s,"hi8(#0x%2.2x)",val);
+-		return 2;
+-		break;
+-	case ST8_LO8:
+-		val = buf[0];
+-		sym = find_symbol(val);
+-		if (sym)
+-			sprintf(s,"lo8(#%s)",sym);
+-		else
+-			sprintf(s,"lo8(#0x%2.2x)",val);
+-		return 2;
+-		break;
+-	case ST8_HH8:
+-		val = buf[0];
+-		sym = find_symbol(val);
+-		if (sym)
+-			sprintf(s,"hh8(#%s)",sym);
+-		else
+-			sprintf(s,"hh8(#0x%4.4x)",val);
+-		return 3;
+-		break;
+ 	case ST8_END:
+ 		break;
+ 	}
+Index: gdb-8.1/opcodes/stm8-opc.c
+===================================================================
+--- gdb-8.1.orig/opcodes/stm8-opc.c
++++ gdb-8.1/opcodes/stm8-opc.c
+@@ -496,9 +496,6 @@ const struct stm8_opcodes_s stm8_opcodes
+ {"push", {ST8_REG_CC}, 0x8A},
+ {"push", {ST8_BYTE}, 0x4B},
+ {"push", {ST8_LONGMEM}, 0x3B},
+-{"push", {ST8_HI8}, 0x4B},
+-{"push", {ST8_LO8}, 0x4B},
+-{"push", {ST8_HH8}, 0x4B},
+ //pushw
+ {"pushw", {ST8_REG_X}, 0x89},
+ {"pushw", {ST8_REG_Y}, 0x9089},
+@@ -769,8 +766,6 @@ int stm8_compute_insn_size(struct stm8_o
+ 		case ST8_SHORTOFF_X:
+ 		case ST8_SHORTOFF_Y:
+ 		case ST8_SHORTOFF_SP:
+-		case ST8_LO8:
+-		case ST8_HI8:
+ 			ret++;
+ 			break;
+ 		case ST8_LONGPTRE_Y:
+@@ -788,7 +783,6 @@ int stm8_compute_insn_size(struct stm8_o
+ 		case ST8_EXTMEM:
+ 		case ST8_EXTOFF_X:
+ 		case ST8_EXTOFF_Y:
+-		case ST8_HH8:
+ 			ret += 3;
+ 			break;
+ 		case ST8_END:

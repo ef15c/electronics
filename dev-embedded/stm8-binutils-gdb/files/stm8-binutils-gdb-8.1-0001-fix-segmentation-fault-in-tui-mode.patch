@@ -1,0 +1,26 @@
+Index: binutils-2.30/gdb/configure.ac
+===================================================================
+--- binutils-2.30.orig/gdb/configure.ac
++++ binutils-2.30/gdb/configure.ac
+@@ -604,7 +604,7 @@ case $host_os in
+ esac
+ 
+ # These are the libraries checked by Readline.
+-AC_SEARCH_LIBS(tgetent, [termcap tinfo curses ncursesw ncurses])
++AC_SEARCH_LIBS(tgetent, [termcap tinfow curses ncursesw ncurses])
+ 
+ if test "$ac_cv_search_tgetent" = no; then
+   CONFIG_OBS="$CONFIG_OBS stub-termcap.o"
+Index: binutils-2.30/gdb/configure
+===================================================================
+--- binutils-2.30.orig/gdb/configure
++++ binutils-2.30/gdb/configure
+@@ -8852,7 +8852,7 @@ return tgetent ();
+   return 0;
+ }
+ _ACEOF
+-for ac_lib in '' termcap tinfo curses ncursesw ncurses; do
++for ac_lib in '' termcap tinfow curses ncursesw ncurses; do
+   if test -z "$ac_lib"; then
+     ac_res="none required"
+   else
