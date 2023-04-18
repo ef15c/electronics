@@ -1,0 +1,709 @@
+Index: gdb-12.1/gdb/stm8-tdep.c
+===================================================================
+--- gdb-12.1.orig/gdb/stm8-tdep.c	2023-04-18 18:40:45.252928587 +0200
++++ gdb-12.1/gdb/stm8-tdep.c	2023-04-18 18:47:43.005956685 +0200
+@@ -4,6 +4,9 @@
+ 
+    Copyright (C) 1996-2018 Free Software Foundation, Inc.
+ 
++   updated by Christian Schoffit for GDB version 12
++   Copyright (C) 2023
++
+    This file is part of GDB.
+ 
+    This program is free software; you can redistribute it and/or modify
+@@ -35,6 +38,8 @@
+ #include "objfiles.h"
+ #include "target-descriptions.h"
+ #include "dwarf2/frame.h"
++#include "features/stm8.c"
++
+ 
+ enum stm8_regnum
+ {
+@@ -68,7 +73,7 @@
+ 
+ #define STM8_NUM_REGS ARRAY_SIZE (stm8_register_names)
+ 
+-struct gdbarch_tdep
++struct stm8_gdbarch_tdep : gdbarch_tdep
+ {
+   enum stm8_producer producer;
+   /* Type for void.  */
+@@ -89,8 +94,6 @@
+ stm8_convert_register_p (struct gdbarch *gdbarch, int regnum,
+ 		struct type *type)
+ {
+-	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+-
+ 	if ((regnum == STM8_SP_REGNUM) && (TYPE_LENGTH(type) > 2))
+ 	{
+ 		return 1;
+@@ -115,41 +118,43 @@
+ 		struct type *type, gdb_byte *to,
+ 		int *optimizedp, int *unavailablep)
+ {
+-	/* Convert to TYPE.  */
++  struct gdbarch *gdbarch = get_frame_arch (frame);
++  /* Convert to TYPE.  */
+ 
+-	memset(to,0,TYPE_LENGTH(type));
++  memset(to,0,TYPE_LENGTH(type));
+ 
+-	if (!get_frame_register_bytes (frame, regnum, 0, 2,
+-			to+TYPE_LENGTH(type)-2, optimizedp, unavailablep))
+-		return 0;
++  if (!get_frame_register_bytes (frame, regnum, 0,
++				 gdb::make_array_view (to,
++						register_size (gdbarch,
++							       regnum)),
++				 optimizedp, unavailablep))
++    return 0;
+ 
+-	*optimizedp = *unavailablep = 0;
+-	return 1;
++  *optimizedp = *unavailablep = 0;
++  return 1;
+ }
+ 
+ static stm8_producer
+ stm8_get_producer()
+ {
+-  struct objfile *objfile;
+-  struct compunit_symtab *cust;
+-
+   if (current_program_space != NULL)
+   {
+-    ALL_COMPUNITS(objfile, cust)
+-    {
+-      if (cust
+-        && COMPUNIT_PRODUCER (cust) != NULL
+-        && startswith (COMPUNIT_PRODUCER (cust), "SDCC"))
++    for (struct objfile *objfile : current_program_space->objfiles())
++      for (struct compunit_symtab *cust : objfile->compunits())
+       {
+-        return SDCC_PRODUCER;
++        if (cust
++          && cust->producer() != NULL
++          && startswith (cust->producer(), "SDCC"))
++        {
++          return SDCC_PRODUCER;
++        }
+       }
+-    }
+   }
+   return GCC_PRODUCER;
+ }
+ 
+ static void
+-stm8_initialize_soft_register_info(struct gdbarch_tdep *tdep)
++stm8_initialize_soft_register_info(struct stm8_gdbarch_tdep *tdep)
+ {
+   tdep->producer = stm8_get_producer();
+ }
+@@ -180,8 +185,6 @@
+ static struct type *
+ stm8_register_type (struct gdbarch *gdbarch, int regnum)
+ {
+-	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+-
+ 	switch (regnum)
+ 	{
+ 	case STM8_PC_REGNUM:
+@@ -197,20 +200,17 @@
+ }
+ 
+ static enum register_status
+-stm8_pseudo_register_read (struct gdbarch *gdbarch, struct regcache *regcache,
++stm8_pseudo_register_read (struct gdbarch *gdbarch, struct readable_regcache *regcache,
+ 		int regnum, gdb_byte *buf)
+ {
+ 	enum register_status status;
+-	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+-	enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
+-	int regsize = 2;
+ 	gdb_byte tmp[4];
+ 
+ 
+ 	switch (regnum)
+ 	{
+ 	case STM8_XH_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_X_REGNUM, tmp);
++		status = regcache->raw_read(STM8_X_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 			buf[0] = tmp[0];
+@@ -218,7 +218,7 @@
+ 		return status;
+ 
+ 	case STM8_XL_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_X_REGNUM, tmp);
++		status = regcache->raw_read(STM8_X_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 			buf[0] = tmp[1];
+@@ -226,7 +226,7 @@
+ 		return status;
+ 
+ 	case STM8_YH_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_Y_REGNUM, tmp);
++		status = regcache->raw_read(STM8_Y_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 			buf[0] = tmp[0];
+@@ -234,7 +234,7 @@
+ 		return status;
+ 
+ 	case STM8_YL_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_Y_REGNUM, tmp);
++		status = regcache->raw_read(STM8_Y_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 			buf[0] = tmp[1];
+@@ -252,47 +252,44 @@
+ 		int regnum, const gdb_byte *buf)
+ {
+ 	enum register_status status;
+-	enum bfd_endian byte_order = gdbarch_byte_order (target_gdbarch ());
+-	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+-	const int regsize = 2;
+ 	gdb_byte tmp[4];
+ 
+ 	switch (regnum)
+ 	{
+ 
+ 	case STM8_XH_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_X_REGNUM, tmp);
++		status = regcache->raw_read( STM8_X_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 		  tmp[0] = buf[0];
+-		  regcache_raw_write (regcache, STM8_X_REGNUM, tmp);
++		  regcache->raw_write( STM8_X_REGNUM, tmp);
+ 	  }
+ 	  return;
+ 
+ 	case STM8_XL_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_X_REGNUM, tmp);
++		status = regcache->raw_read( STM8_X_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 		  tmp[1] = buf[0];
+-		  regcache_raw_write (regcache, STM8_X_REGNUM, tmp);
++		  regcache->raw_write( STM8_X_REGNUM, tmp);
+ 	  }
+ 	  return;
+ 
+ 	case STM8_YH_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_Y_REGNUM, tmp);
++		status = regcache->raw_read( STM8_Y_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 		  tmp[0] = buf[0];
+-		  regcache_raw_write (regcache, STM8_Y_REGNUM, tmp);
++		  regcache->raw_write( STM8_Y_REGNUM, tmp);
+ 	  }
+ 	  return;
+ 
+ 	case STM8_YL_REGNUM:
+-		status = regcache_raw_read(regcache, STM8_Y_REGNUM, tmp);
++		status = regcache->raw_read( STM8_Y_REGNUM, tmp);
+ 		if (status == REG_VALID)
+ 		{
+ 		  tmp[1] = buf[0];
+-		  regcache_raw_write (regcache, STM8_Y_REGNUM, tmp);
++		  regcache->raw_write( STM8_Y_REGNUM, tmp);
+ 	  }
+ 	  return;
+ 
+@@ -359,7 +356,6 @@
+ 	if (stm8_debug)
+ 		fprintf_unfiltered (gdb_stdlog, "stm8_sw_breakpoint_from_kind called\n");
+ 
+-	enum bfd_endian byte_order_for_code = gdbarch_byte_order_for_code (gdbarch);
+ 
+ 	static gdb_byte stm8_breakpoint[] = { 0x8b };
+ 
+@@ -396,7 +392,6 @@
+ {
+   int ret = -1;
+ 
+-  struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
+   static int * t;
+ 
+   if (stm8_get_producer() == SDCC_PRODUCER)
+@@ -433,7 +428,7 @@
+ 	gdb_byte buf[4];
+ 	CORE_ADDR pc;
+ 
+-	struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
++	stm8_gdbarch_tdep *tdep = (stm8_gdbarch_tdep *) gdbarch_tdep (gdbarch);
+ 	frame_unwind_register (next_frame, STM8_PC_REGNUM, buf);
+ 	if (frame_relative_level(next_frame) < 0)
+ 		pc = extract_typed_address (buf, builtin_type (gdbarch)->builtin_func_ptr);
+@@ -481,7 +476,7 @@
+ stm8_get_return_insn (CORE_ADDR pc)
+ {
+ 	const char *name;
+-	CORE_ADDR func_addr, func_end, stop;
++	CORE_ADDR func_addr, func_end;
+ 
+ 	if (find_pc_partial_function (pc, &name, &func_addr, &func_end))
+ 	{
+@@ -729,12 +724,14 @@
+ 
+ 	cache->base = current_sp;
+ 	if (cache->return_kind == RETURN_IRET)
+-		cache->saved_regs[STM8_PC_REGNUM].addr = cache->base + 1 + 6;
++		cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 1 + 6 );
+ 	else
+-		cache->saved_regs[STM8_PC_REGNUM].addr = cache->base + 1;
+-	trad_frame_set_value (cache->saved_regs,
+-			STM8_SP_REGNUM,
+-			cache->base+retsize);
++		cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 1 );
++//	trad_frame_set_value (cache->saved_regs,
++//			STM8_SP_REGNUM,
++//			cache->base+retsize);
++	cache->saved_regs[STM8_PC_REGNUM].set_value ( cache->base+retsize );
++
+ 
+ 	if (stm8_debug)
+ 	{
+@@ -747,8 +744,8 @@
+ 		frame_sp =  value_as_long(trad_frame_get_prev_register (next_frame, cache->saved_regs, STM8_SP_REGNUM));
+ 
+ 		frame_pc = frame_pc >> 16;
+-		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) pc=%8.8lx *pc=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr, (unsigned long)frame_pc);
+-		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) sp=%8.8lx *sp=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr, (unsigned long)frame_sp);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) pc=%8.8lx *pc=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr(), (unsigned long)frame_pc);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) sp=%8.8lx *sp=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr(), (unsigned long)frame_sp);
+ 	}
+ 
+ 	return (struct stm8_frame_cache *) (*this_cache);
+@@ -803,13 +800,13 @@
+ 	len = TYPE_LENGTH (type);
+ 
+ 	if (len == 1)
+-		regcache_raw_write_part (regcache, STM8_A_REGNUM, 0, 1, valbuf);
++		regcache->raw_write_part (STM8_A_REGNUM, 0, 1, valbuf);
+ 	else if (len == 2)
+-		regcache_raw_write_part (regcache, STM8_X_REGNUM, 0, 2, valbuf);
++		regcache->raw_write_part (STM8_X_REGNUM, 0, 2, valbuf);
+ 	else if (len == 4)
+ 	{
+-		regcache_raw_write_part (regcache, STM8_X_REGNUM, 0, 2, valbuf+2);
+-		regcache_raw_write_part (regcache, STM8_Y_REGNUM, 0, 2, valbuf);
++		regcache->raw_write_part (STM8_X_REGNUM, 0, 2, valbuf+2);
++		regcache->raw_write_part (STM8_Y_REGNUM, 0, 2, valbuf);
+ 	}
+ 	else
+ 		error (_("return of value > 4 is not supported."));
+@@ -827,19 +824,19 @@
+ 	switch (TYPE_LENGTH (type))
+ 	{
+ 	case 1:
+-		regcache_raw_read (regcache, STM8_A_REGNUM, buf);
++		regcache->raw_read (STM8_A_REGNUM, buf);
+ 		memcpy (valbuf, buf, 1);
+ 		break;
+ 
+ 	case 2:
+-		regcache_raw_read (regcache, STM8_X_REGNUM, buf);
++		regcache->raw_read (STM8_X_REGNUM, buf);
+ 		memcpy (valbuf, buf, 2);
+ 		break;
+ 
+ 	case 4:
+-		regcache_raw_read (regcache, STM8_X_REGNUM, buf);
++		regcache->raw_read (STM8_X_REGNUM, buf);
+ 		memcpy ((char*) valbuf + 2, buf, 2);
+-		regcache_raw_read (regcache, STM8_Y_REGNUM, buf);
++		regcache->raw_read (STM8_Y_REGNUM, buf);
+ 		memcpy (valbuf, buf, 2);
+ 		break;
+ 
+@@ -853,9 +850,9 @@
+ 		struct type *valtype, struct regcache *regcache,
+ 		gdb_byte *readbuf, const gdb_byte *writebuf)
+ {
+-	if (TYPE_CODE (valtype) == TYPE_CODE_STRUCT
+-			|| TYPE_CODE (valtype) == TYPE_CODE_UNION
+-			|| TYPE_CODE (valtype) == TYPE_CODE_ARRAY
++	if (valtype->code () == TYPE_CODE_STRUCT
++			|| valtype->code () == TYPE_CODE_UNION
++			|| valtype->code () == TYPE_CODE_ARRAY
+ 			|| TYPE_LENGTH (valtype) > 4)
+ 		return RETURN_VALUE_STRUCT_CONVENTION;
+ 	else
+@@ -869,6 +866,7 @@
+ }
+ 
+ static const struct frame_unwind stm8_frame_unwind = {
++		"stm8",
+ 		NORMAL_FRAME,
+ 		default_frame_unwind_stop_reason,
+ 		stm8_frame_this_id,
+@@ -877,89 +875,21 @@
+ 		default_frame_sniffer
+ };
+ 
+-//static CORE_ADDR
+-//stm8_frame_base_address (struct frame_info *next_frame,
+-//		void **this_cache)
+-//{
+-//	struct stm8_frame_cache *cache =
+-//			stm8_frame_cache (next_frame, this_cache);
+-//
+-//	if (stm8_debug)
+-//		fprintf_unfiltered (gdb_stdlog, "stm8_frame_base_address: fb=%8.8lx\n", (unsigned long)cache->base);
+-//
+-//	return cache->base;
+-//}
+-
+-//static CORE_ADDR
+-//stm8_frame_args_address (struct frame_info *this_frame, void **this_cache)
+-//{
+-//	CORE_ADDR addr;
+-//	struct stm8_frame_cache *info
+-//	= stm8_frame_cache (this_frame, this_cache);
+-//
+-//	addr = info->base;
+-//	if (info->return_kind == RETURN_IRET)
+-//		addr += 12; //2 bytes fp + 9 bytes regs + 1
+-//	else if (info->return_kind == RETURN_RETF)
+-//		addr += 6; //2 bytes fp + 3 bytes pc + 1
+-//	else
+-//		addr += 5; //2 bytes fp + 2 bytes pc + 1
+-//
+-//	if (stm8_debug)
+-//		fprintf_unfiltered (gdb_stdlog, "stm8_frame_args_address: addr = %8.8lx\n", (unsigned long)addr);
+-//
+-//	return addr;
+-//}
+-
+-//static const struct frame_base stm8_frame_base =
+-//{
+-//		&stm8_frame_unwind,
+-//		stm8_frame_base_address,
+-//		stm8_frame_base_address,
+-//		stm8_frame_args_address
+-//};
+-//
+-//static const struct frame_base *
+-//stm8_frame_base_sniffer (struct frame_info *this_frame)
+-//{
+-//	return &stm8_frame_base;
+-//}
+-
+-struct target_desc *tdesc_stm8;
+-static void
+-initialize_tdesc_stm8 (void)
+-{
+-	struct target_desc *result = allocate_target_description ();
+-	struct tdesc_feature *feature;
+-
+-	feature = tdesc_create_feature (result, "org.gnu.gdb.stm8.core");
+-	tdesc_create_reg (feature, "pc", 0, 1, "general", 32, "uint32");
+-	tdesc_create_reg (feature, "a", 1, 1, "general", 8, "uint8");
+-	tdesc_create_reg (feature, "x", 2, 1, "general", 16, "uint16");
+-	tdesc_create_reg (feature, "y", 3, 1, "general", 16, "uint16");
+-	tdesc_create_reg (feature, "sp", 4, 1, "general", 16, "uint16");
+-	tdesc_create_reg (feature, "cc", 5, 1, "general", 8, "uint8");
+-
+-	tdesc_stm8 = result;
+-}
+-
+-
+ /* Initialize the gdbarch structure for the STM8.  */
+ 
+ static struct gdbarch *
+ stm8_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
+ {
++  stm8_gdbarch_tdep *tdep;
+   struct gdbarch *gdbarch;
+-  struct gdbarch_tdep *tdep;
+-  struct gdbarch_list *best_arch;
+-  struct tdesc_arch_data *tdesc_data = NULL;
++  tdesc_arch_data_up tdesc_data = NULL;
+   const struct target_desc *tdesc = info.target_desc = 0; //override target desc if any
+ 
+   /* If there is already a candidate, use it.  */
+   arches = gdbarch_list_lookup_by_info (arches, &info);
+   if (arches != NULL)
+   {
+-	  tdep = gdbarch_tdep (arches->gdbarch);
++	  tdep = (stm8_gdbarch_tdep *) gdbarch_tdep (arches->gdbarch);
+ 	  stm8_initialize_soft_register_info(tdep);
+ 	  return arches->gdbarch;
+   }
+@@ -971,7 +901,6 @@
+     {
+       const struct tdesc_feature *feature;
+       int valid_p;
+-      int i;
+ 
+       feature = tdesc_find_feature (tdesc,
+ 				    "org.gnu.gdb.stm8.core");
+@@ -981,17 +910,14 @@
+ 
+       valid_p = 1;
+       for (int i = 0; i < STM8_NUM_REGS; i++)
+-        valid_p &= tdesc_numbered_register (feature, tdesc_data, i,
++        valid_p &= tdesc_numbered_register (feature, tdesc_data.get (), i,
+         		stm8_register_names[i]);
+       if (!valid_p)
+-        {
+-          tdesc_data_cleanup (tdesc_data);
+           return NULL;
+-        }
+     }
+ 
+   /* None found, create a new architecture from the information provided.  */
+-  tdep = XNEW (struct gdbarch_tdep);
++  tdep = new stm8_gdbarch_tdep;
+   gdbarch = gdbarch_alloc (&info, tdep);
+ 
+   /* Initialize soft registers */
+@@ -1038,7 +964,7 @@
+ 
+   //set_gdbarch_frame_args_skip (gdbarch, 8);
+ 
+-  set_gdbarch_print_insn (gdbarch, print_insn_stm8);
++  //set_gdbarch_print_insn (gdbarch, print_insn_stm8);
+ 
+   set_gdbarch_write_pc (gdbarch, stm8_write_pc);
+ 
+@@ -1064,9 +990,10 @@
+ //
+   tdep->void_type = arch_type (gdbarch, TYPE_CODE_VOID, TARGET_CHAR_BIT, "void");
+   tdep->func_void_type = make_function_type (tdep->void_type, NULL);
+-  tdep->pc_type = arch_type (gdbarch, TYPE_CODE_PTR, 2*TARGET_CHAR_BIT, NULL);
+-  TYPE_TARGET_TYPE (tdep->pc_type) = tdep->func_void_type;
+-  TYPE_UNSIGNED (tdep->pc_type) = 1;
++  tdep->pc_type = arch_pointer_type (gdbarch,
++  				     2*TARGET_CHAR_BIT,
++				     NULL, tdep->func_void_type);
++  tdep->pc_type->set_is_unsigned (true);
+ 
+ //  set_gdbarch_short_bit (gdbarch, 2 * TARGET_CHAR_BIT);
+ //  set_gdbarch_int_bit (gdbarch, 2 * TARGET_CHAR_BIT);
+@@ -1099,7 +1026,7 @@
+ //
+ 
+   if (tdesc_data != NULL)
+-    tdesc_use_registers (gdbarch, tdesc, tdesc_data);
++    tdesc_use_registers (gdbarch, tdesc, std::move (tdesc_data));
+ 
+   return gdbarch;
+ }
+@@ -1111,10 +1038,10 @@
+ 	fprintf_filtered (file, _("stm8 debugging is %s.\n"), value);
+ }
+ 
+-extern initialize_file_ftype _initialize_stm8_tdep; /* -Wmissing-prototypes */
++extern initialize_file_ftype _initialize_stm8_tdep;
+ 
+ void
+-_initialize_stm8_tdep (void)
++_initialize_stm8_tdep ()
+ {
+ 	stm8_debug = 0;
+ 	register_gdbarch_init (bfd_arch_stm8, stm8_gdbarch_init);
+Index: gdb-12.1/gdb/features/stm8.xml
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-12.1/gdb/features/stm8.xml	2023-04-18 18:41:11.398350084 +0200
+@@ -0,0 +1,12 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE target SYSTEM "gdb-target.dtd">
++<target>
++  <architecture>stm8</architecture>
++  <xi:include href="stm8-core.xml"/>
++</target>
+Index: gdb-12.1/gdb/features/Makefile
+===================================================================
+--- gdb-12.1.orig/gdb/features/Makefile	2022-05-01 20:46:31.000000000 +0200
++++ gdb-12.1/gdb/features/Makefile	2023-04-18 18:41:11.399350100 +0200
+@@ -164,7 +164,8 @@
+ 	s390x-vx-linux64.xml \
+ 	s390-gs-linux64.xml \
+ 	s390x-gs-linux64.xml \
+-	z80.xml
++	z80.xml \
++	stm8.xml
+ 
+ TDESC_CFILES = $(patsubst %.xml,%.c,$(XMLTOC))
+ GDB = false
+Index: gdb-12.1/gdb/features/stm8.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-12.1/gdb/features/stm8.c	2023-04-18 18:41:11.399350100 +0200
+@@ -0,0 +1,36 @@
++/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
++  Original: stm8.xml */
++
++#include "defs.h"
++#include "osabi.h"
++#include "target-descriptions.h"
++
++struct target_desc *tdesc_stm8;
++static void
++initialize_tdesc_stm8 (void)
++{
++  target_desc_up result = allocate_target_description ();
++  set_tdesc_architecture (result.get (), bfd_scan_arch ("stm8"));
++
++  struct tdesc_feature *feature;
++
++  feature = tdesc_create_feature (result.get (), "org.gnu.gdb.stm8.core");
++  tdesc_type_with_fields *type_with_fields;
++  type_with_fields = tdesc_create_flags (feature, "cc_flags", 1);
++  tdesc_add_flag (type_with_fields, 0, "C");
++  tdesc_add_flag (type_with_fields, 1, "Z");
++  tdesc_add_flag (type_with_fields, 2, "N");
++  tdesc_add_flag (type_with_fields, 3, "I0");
++  tdesc_add_flag (type_with_fields, 4, "H");
++  tdesc_add_flag (type_with_fields, 5, "I1");
++  tdesc_add_flag (type_with_fields, 7, "V");
++
++  tdesc_create_reg (feature, "pc", 0, 1, NULL, 32, "code_ptr");
++  tdesc_create_reg (feature, "a" , 1, 1, NULL,  8, "uint8");
++  tdesc_create_reg (feature, "x",  2, 1, NULL, 16, "data_ptr");
++  tdesc_create_reg (feature, "y",  3, 1, NULL, 16, "data_ptr");
++  tdesc_create_reg (feature, "sp", 4, 1, NULL, 16, "data_ptr");
++  tdesc_create_reg (feature, "cc", 5, 1, NULL,  8, "cc_flags");
++
++  tdesc_stm8 = result.release ();
++}
+Index: gdb-12.1/bfd/cpu-stm8.c
+===================================================================
+--- gdb-12.1.orig/bfd/cpu-stm8.c	2023-04-18 18:40:45.117926405 +0200
++++ gdb-12.1/bfd/cpu-stm8.c	2023-04-18 18:41:11.399350100 +0200
+@@ -37,5 +37,6 @@
+   bfd_default_compatible,       /* architecture comparison fn */
+   bfd_default_scan,             /* string to architecture convert fn */
+   bfd_arch_default_fill,
++  NULL,
+   0,
+ };
+Index: gdb-12.1/bfd/elf32-stm8.c
+===================================================================
+--- gdb-12.1.orig/bfd/elf32-stm8.c	2023-04-18 18:40:45.139926761 +0200
++++ gdb-12.1/bfd/elf32-stm8.c	2023-04-18 18:49:28.594675422 +0200
+@@ -222,14 +222,23 @@
+   return NULL;
+ }
+ 
+-static void
++static bool
+ elf32_stm8_info_to_howto (bfd * abfd ATTRIBUTE_UNUSED, arelent * bfd_reloc,
+                          Elf_Internal_Rela * elf_reloc)
+ {
+   unsigned int r_type;
+ 
+   r_type = ELF32_R_TYPE (elf_reloc->r_info);
+-  bfd_reloc->howto = elf32_stm8_howto_from_type (r_type);
++
++  reloc_howto_type *howto = elf32_stm8_howto_from_type (r_type);
++  if (howto != NULL) {
++
++    bfd_reloc->howto = howto;
++    return true;
++  } else {
++    bfd_set_error (bfd_error_bad_value);
++    return false;
++  }
+ }
+ 
+ struct elf32_stm8_reloc_map
+@@ -279,6 +288,7 @@
+   return NULL;
+ }
+ 
++#if 0
+ static void
+ elf32_stm8_post_process_headers (bfd *abfd,
+                  struct bfd_link_info *info ATTRIBUTE_UNUSED)
+@@ -289,6 +299,7 @@
+ //  i_ehdrp->e_ident[EI_OSABI] = get_elf_backend_data (abfd)->elf_osabi;
+   i_ehdrp->e_ident[EI_ABIVERSION] = 0;
+ }
++#endif
+ 
+ static bool
+ elf32_stm8_modify_segment_map (bfd *abfd,
+@@ -306,7 +317,7 @@
+   return true;
+ }
+ 
+-static bool
++static int
+ elf32_stm8_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
+                 struct bfd_link_info *info,
+                 bfd *input_bfd,
+Index: gdb-12.1/opcodes/stm8-dis.c
+===================================================================
+--- gdb-12.1.orig/opcodes/stm8-dis.c	2023-04-18 18:40:45.240928393 +0200
++++ gdb-12.1/opcodes/stm8-dis.c	2023-04-18 18:41:11.400350116 +0200
+@@ -37,7 +37,7 @@
+ int stm8_dis(bfd_vma addr, unsigned int op);
+ int stm8_operands(char *s, unsigned char buf[], stm8_addr_mode_t arg);
+ const char* find_symbol(unsigned int addr);
+-int find_symbol_x(bfd_vma addr);
++//int find_symbol_x(bfd_vma addr);
+ 
+ 
+ static int
+@@ -49,10 +49,10 @@
+   return r;
+ }
+ 
+-int find_symbol_x(bfd_vma addr)
+-{
+-	return dinfo->symbol_at_address_func(addr,dinfo);
+-}
++//int find_symbol_x(bfd_vma addr)
++//{
++//	return dinfo->symbol_at_address_func(addr,dinfo);
++//}
+ 
+ const char* find_symbol(unsigned int addr)
+ {
+Index: gdb-12.1/gdb/features/stm8-core.xml
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ gdb-12.1/gdb/features/stm8-core.xml	2023-04-18 18:41:11.400350116 +0200
+@@ -0,0 +1,26 @@
++<?xml version="1.0"?>
++<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
++
++     Copying and distribution of this file, with or without modification,
++     are permitted in any medium without royalty provided the copyright
++     notice and this notice are preserved.  -->
++
++<!DOCTYPE feature SYSTEM "gdb-target.dtd">
++<feature name="org.gnu.gdb.stm8.core">
++  <flags id="cc_flags" size="1">
++    <field name="C" start="0" end="0"/>
++    <field name="Z" start="1" end="1"/>
++    <field name="N" start="2" end="2"/>
++    <field name="I0" start="3" end="3"/>
++    <field name="H" start="4" end="4"/>
++    <field name="I1" start="5" end="5"/>
++<!-- Bit 6 reserved -->
++    <field name="V" start="7" end="7"/>
++  </flags>
++  <reg name="pc" bitsize="32" type="code_ptr" />
++  <reg name="a" bitsize="8" type="uint8"/>
++  <reg name="x" bitsize="16" type="data_ptr"/>
++  <reg name="y" bitsize="16" type="data_ptr"/>
++  <reg name="sp" bitsize="16" type="data_ptr"/>
++  <reg name="cc" bitsize="8" type="cc_flags"/>
++</feature>

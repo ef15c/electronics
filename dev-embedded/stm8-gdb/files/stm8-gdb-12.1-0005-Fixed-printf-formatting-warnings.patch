@@ -12,10 +12,10 @@ Signed-off-by: Åke Rehnman <ake_rehnman_at_gmail_com>
  gdb/stm8-tdep.c | 38 ++++++++++++++++++++------------------
  1 file changed, 20 insertions(+), 18 deletions(-)
 
-Index: gdb-8.1/gdb/stm8-tdep.c
+Index: gdb-12.1/gdb/stm8-tdep.c
 ===================================================================
---- gdb-8.1.orig/gdb/stm8-tdep.c
-+++ gdb-8.1/gdb/stm8-tdep.c
+--- gdb-12.1.orig/gdb/stm8-tdep.c
++++ gdb-12.1/gdb/stm8-tdep.c
 @@ -34,7 +34,6 @@
  #include "dis-asm.h"
  #include "objfiles.h"

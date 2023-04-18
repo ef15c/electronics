@@ -1,0 +1,80 @@
+Index: gdb-12.1/libiberty/memmove.c
+===================================================================
+--- gdb-12.1.orig/libiberty/memmove.c	2022-03-20 05:59:57.000000000 +0100
++++ gdb-12.1/libiberty/memmove.c	2023-04-18 11:32:24.686693721 +0200
+@@ -16,11 +16,26 @@
+ #include <ansidecl.h>
+ #include <stddef.h>
+ 
+-void bcopy (const void*, void*, size_t);
+-
+ PTR
+-memmove (PTR s1, const PTR s2, size_t n)
++memmove (PTR dest, const PTR src, size_t len)
++//memmove (PTR s1, const PTR s2, size_t l)
+ {
+-  bcopy (s2, s1, n);
+-  return s1;
++  if (dest < src)
++    {
++      const char *firsts = (const char *) src;
++      char *firstd = (char *) dest;
++      while (len--)
++	*firstd++ = *firsts++;
++    }
++  else
++    {
++      const char *lasts = (const char *)src + (len-1);
++      char *lastd = (char *)dest + (len-1);
++      while (len--)
++        *lastd-- = *lasts--;
++    }
++  return dest;
++
++//  bcopy (s2, s1, n);
++//  return s1;
+ }
+Index: gdb-12.1/gnulib/import/strerror_r.c
+===================================================================
+--- gdb-12.1.orig/gnulib/import/strerror_r.c	2022-05-01 20:46:31.000000000 +0200
++++ gdb-12.1/gnulib/import/strerror_r.c	2023-04-18 11:36:33.873269005 +0200
+@@ -32,6 +32,10 @@
+ # include <stdarg.h>
+ #endif
+ 
++#if defined(unix) || defined(__unix__) || defined(__unix)
++#define _vsnprintf vsnprintf
++#endif
++
+ #include "strerror-override.h"
+ 
+ #if (__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__) && HAVE___XPG_STRERROR_R /* glibc >= 2.3.4, cygwin >= 1.7.9 */
+Index: gdb-12.1/libiberty/vfprintf.c
+===================================================================
+--- gdb-12.1.orig/libiberty/vfprintf.c	2022-03-20 05:59:57.000000000 +0100
++++ gdb-12.1/libiberty/vfprintf.c	2023-04-18 11:32:24.687693736 +0200
+@@ -8,6 +8,11 @@
+ #include <stdio.h>
+ #undef vfprintf
+ 
++extern int _doprnt(
++	const char	*fmt,
++	va_list		args,
++	FILE		*stream);
++
+ int
+ vfprintf (FILE *stream, const char *format, va_list ap)
+ {
+Index: gdb-12.1/gnulib/import/isblank.c
+===================================================================
+--- gdb-12.1.orig/gnulib/import/isblank.c	2022-05-01 20:46:31.000000000 +0200
++++ gdb-12.1/gnulib/import/isblank.c	2023-04-18 11:32:24.687693736 +0200
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ 
+ /* Specification.  */
+-#include <ctype.h>
++// #include <ctype.h>
+ 
+ int
+ isblank (int c)

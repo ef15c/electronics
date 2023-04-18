@@ -1,72 +1,8 @@
-From 22cbcafce0c08683209fe1bba2b7faef111764d4 Mon Sep 17 00:00:00 2001
-From: Ake Rehnman <ake_rehnman_at_gmail_com>
-Date: Fri, 24 Feb 2017 11:51:54 +0100
-Subject: [PATCH 01/18] First commit for stm8-binutils-gdb
-
-# Conflicts:
-#	bfd/archures.c
-#	bfd/bfd-in2.h
-#	bfd/libbfd.h
-#	bfd/reloc.c
-#	gas/configure.tgt
-#	gdb/configure.tgt
----
- bfd/Makefile.am            |   12 +-
- bfd/Makefile.in            |   14 +-
- bfd/archures.c             |    4 +
- bfd/bfd-in2.h              |    5 +
- bfd/config.bfd             |    6 +
- bfd/configure              |    1 +
- bfd/configure.ac           |    1 +
- bfd/cpu-stm8.c             |   40 ++
- bfd/cpu-stm8.h             |    6 +
- bfd/elf32-stm8.c           |  285 +++++++++
- bfd/elfcode.h              |   22 +-
- bfd/libbfd.h               |    1 +
- bfd/reloc.c                |    5 +
- bfd/targets.c              |    2 +
- config.sub                 |    6 +-
- gas/Makefile.am            |    6 +-
- gas/Makefile.in            |   21 +-
- gas/config/tc-stm8.c       | 1026 ++++++++++++++++++++++++++++++++
- gas/config/tc-stm8.h       |   97 ++++
- gas/configure.tgt          |    4 +-
- gdb/configure.tgt          |    5 +
- gdb/stm8-tdep.c            | 1130 ++++++++++++++++++++++++++++++++++++
- include/dis-asm.h          |    1 +
- include/elf/stm8.h         |   38 ++
- include/opcode/stm8.h      |   82 +++
- ld/Makefile.am             |    7 +-
- ld/Makefile.in             |    7 +-
- ld/configure.tgt           |    2 +
- ld/emulparams/elf32stm8.sh |   14 +
- ld/scripttempl/elfstm8.sc  |  232 ++++++++
- opcodes/Makefile.am        |    4 +-
- opcodes/Makefile.in        |    6 +-
- opcodes/configure          |    1 +
- opcodes/configure.ac       |    1 +
- opcodes/disassemble.c      |    6 +
- opcodes/stm8-dis.c         |  412 +++++++++++++
- opcodes/stm8-opc.c         |  799 +++++++++++++++++++++++++
- 37 files changed, 4286 insertions(+), 25 deletions(-)
- create mode 100644 bfd/cpu-stm8.c
- create mode 100644 bfd/cpu-stm8.h
- create mode 100644 bfd/elf32-stm8.c
- create mode 100644 gas/config/tc-stm8.c
- create mode 100644 gas/config/tc-stm8.h
- create mode 100644 gdb/stm8-tdep.c
- create mode 100644 include/elf/stm8.h
- create mode 100644 include/opcode/stm8.h
- create mode 100644 ld/emulparams/elf32stm8.sh
- create mode 100644 ld/scripttempl/elfstm8.sc
- create mode 100644 opcodes/stm8-dis.c
- create mode 100644 opcodes/stm8-opc.c
-
-Index: gdb-8.1/bfd/Makefile.am
+Index: gdb-12.1/bfd/Makefile.am
 ===================================================================
---- gdb-8.1.orig/bfd/Makefile.am
-+++ gdb-8.1/bfd/Makefile.am
-@@ -176,7 +176,8 @@ ALL_MACHINES = \
+--- gdb-12.1.orig/bfd/Makefile.am
++++ gdb-12.1/bfd/Makefile.am
+@@ -178,7 +178,8 @@ ALL_MACHINES = \
  	cpu-xstormy16.lo \
  	cpu-xtensa.lo \
  	cpu-z80.lo \
@@ -76,7 +12,7 @@ Index: gdb-8.1/bfd/Makefile.am
  
  ALL_MACHINES_CFILES = \
  	cpu-aarch64.c \
-@@ -266,7 +267,8 @@ ALL_MACHINES_CFILES = \
+@@ -264,7 +265,8 @@ ALL_MACHINES_CFILES = \
  	cpu-xstormy16.c \
  	cpu-xtensa.c \
  	cpu-z80.c \
@@ -86,7 +22,7 @@ Index: gdb-8.1/bfd/Makefile.am
  
  # The .o files needed by all of the 32 bit vectors that are configured into
  # target_vector in targets.c if configured with --enable-targets=all.
-@@ -465,7 +467,8 @@ BFD32_BACKENDS = \
+@@ -399,7 +401,8 @@ BFD32_BACKENDS = \
  	xcofflink.lo \
  	xsym.lo \
  	xtensa-isa.lo \
@@ -95,8 +31,8 @@ Index: gdb-8.1/bfd/Makefile.am
 +	elf32-stm8.lo
  
  BFD32_BACKENDS_CFILES = \
- 	aout-adobe.c \
-@@ -661,7 +664,8 @@ BFD32_BACKENDS_CFILES = \
+ 	aout-cris.c \
+@@ -531,7 +534,8 @@ BFD32_BACKENDS_CFILES = \
  	xcofflink.c \
  	xsym.c \
  	xtensa-isa.c \
@@ -106,11 +42,11 @@ Index: gdb-8.1/bfd/Makefile.am
  
  # The .o files needed by all of the 64 bit vectors that are configured into
  # target_vector in targets.c if configured with --enable-targets=all
-Index: gdb-8.1/bfd/Makefile.in
+Index: gdb-12.1/bfd/Makefile.in
 ===================================================================
---- gdb-8.1.orig/bfd/Makefile.in
-+++ gdb-8.1/bfd/Makefile.in
-@@ -509,7 +509,8 @@ ALL_MACHINES = \
+--- gdb-12.1.orig/bfd/Makefile.in
++++ gdb-12.1/bfd/Makefile.in
+@@ -645,7 +645,8 @@ ALL_MACHINES = \
  	cpu-xstormy16.lo \
  	cpu-xtensa.lo \
  	cpu-z80.lo \
@@ -120,7 +56,7 @@ Index: gdb-8.1/bfd/Makefile.in
  
  ALL_MACHINES_CFILES = \
  	cpu-aarch64.c \
-@@ -599,7 +600,8 @@ ALL_MACHINES_CFILES = \
+@@ -731,7 +732,8 @@ ALL_MACHINES_CFILES = \
  	cpu-xstormy16.c \
  	cpu-xtensa.c \
  	cpu-z80.c \
@@ -130,7 +66,7 @@ Index: gdb-8.1/bfd/Makefile.in
  
  
  # The .o files needed by all of the 32 bit vectors that are configured into
-@@ -799,7 +801,8 @@ BFD32_BACKENDS = \
+@@ -867,7 +869,8 @@ BFD32_BACKENDS = \
  	xcofflink.lo \
  	xsym.lo \
  	xtensa-isa.lo \
@@ -139,8 +75,8 @@ Index: gdb-8.1/bfd/Makefile.in
 +	elf32-stm8.lo
  
  BFD32_BACKENDS_CFILES = \
- 	aout-adobe.c \
-@@ -995,7 +998,8 @@ BFD32_BACKENDS_CFILES = \
+ 	aout-cris.c \
+@@ -999,7 +1002,8 @@ BFD32_BACKENDS_CFILES = \
  	xcofflink.c \
  	xsym.c \
  	xtensa-isa.c \
@@ -150,7 +86,7 @@ Index: gdb-8.1/bfd/Makefile.in
  
  
  # The .o files needed by all of the 64 bit vectors that are configured into
-@@ -1446,6 +1450,7 @@ distclean-compile:
+@@ -1549,6 +1553,7 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-sh.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-sparc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-spu.Plo@am__quote@
@@ -158,28 +94,28 @@ Index: gdb-8.1/bfd/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-tic30.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-tic4x.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-tic54x.Plo@am__quote@
-@@ -1542,6 +1547,7 @@ distclean-compile:
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-sh64.Plo@am__quote@
+@@ -1636,6 +1641,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-sh.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-sparc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-spu.Plo@am__quote@
 +@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-stm8.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-tic6x.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-tilegx.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-tilepro.Plo@am__quote@
-Index: gdb-8.1/bfd/archures.c
+Index: gdb-12.1/bfd/archures.c
 ===================================================================
---- gdb-8.1.orig/bfd/archures.c
-+++ gdb-8.1/bfd/archures.c
-@@ -537,6 +537,8 @@ DESCRIPTION
- .#define bfd_mach_wasm32	1
- .  bfd_arch_pru,       {* PRU.  *}
- .#define bfd_mach_pru		0
-+.  bfd_arch_stm8,	{* ST STM8 *}
-+.#define bfd_mach_stm8 1
+--- gdb-12.1.orig/bfd/archures.c
++++ gdb-12.1/bfd/archures.c
+@@ -572,6 +572,8 @@ DESCRIPTION
+ .#define bfd_mach_amdgcn_gfx1030 0x036
+ .#define bfd_mach_amdgcn_gfx1031 0x037
+ .#define bfd_mach_amdgcn_gfx1032 0x038
++.  bfd_arch_stm8,      {* ST STM8 *}
++.#define bfd_mach_stm8 		1
  .  bfd_arch_last
  .  };
  */
-@@ -670,6 +672,7 @@ extern const bfd_arch_info_type bfd_xc16
+@@ -710,6 +712,7 @@ extern const bfd_arch_info_type bfd_xc16
  extern const bfd_arch_info_type bfd_xgate_arch;
  extern const bfd_arch_info_type bfd_z80_arch;
  extern const bfd_arch_info_type bfd_z8k_arch;
@@ -187,7 +123,7 @@ Index: gdb-8.1/bfd/archures.c
  
  static const bfd_arch_info_type * const bfd_archures_list[] =
    {
-@@ -762,6 +765,7 @@ static const bfd_arch_info_type * const
+@@ -799,6 +802,7 @@ static const bfd_arch_info_type * const
      &bfd_xgate_arch,
      &bfd_z80_arch,
      &bfd_z8k_arch,
@@ -195,81 +131,57 @@ Index: gdb-8.1/bfd/archures.c
  #endif
    0
  };
-Index: gdb-8.1/bfd/bfd-in2.h
+Index: gdb-12.1/bfd/bfd-in2.h
 ===================================================================
---- gdb-8.1.orig/bfd/bfd-in2.h
-+++ gdb-8.1/bfd/bfd-in2.h
-@@ -2398,6 +2398,8 @@ enum bfd_architecture
- #define bfd_mach_wasm32        1
-   bfd_arch_pru,       /* PRU.  */
- #define bfd_mach_pru           0
-+  bfd_arch_stm8,       /* ST STM8 */
-+#define bfd_mach_stm8 1
+--- gdb-12.1.orig/bfd/bfd-in2.h
++++ gdb-12.1/bfd/bfd-in2.h
+@@ -1951,6 +1951,8 @@ enum bfd_architecture
+ #define bfd_mach_amdgcn_gfx1030 0x036
+ #define bfd_mach_amdgcn_gfx1031 0x037
+ #define bfd_mach_amdgcn_gfx1032 0x038
++  bfd_arch_stm8,      /* ST STM8 */
++#define bfd_mach_stm8          1
    bfd_arch_last
    };
  
-@@ -6512,6 +6514,9 @@ assembler and not (currently) written to
-   BFD_RELOC_WASM32_CODE_POINTER,
-   BFD_RELOC_WASM32_INDEX,
-   BFD_RELOC_WASM32_PLT_SIG,
+@@ -6328,6 +6330,9 @@ assembler and not (currently) written to
+   BFD_RELOC_LARCH_SUB24,
+   BFD_RELOC_LARCH_SUB32,
+   BFD_RELOC_LARCH_SUB64,
 +
 +/* STM8 bit field immediate for BTJx, BCPL, BSET, BRES  instruction.  */
 +  BFD_RELOC_STM8_BIT_FLD,
    BFD_RELOC_UNUSED };
  
  typedef enum bfd_reloc_code_real bfd_reloc_code_real_type;
-Index: gdb-8.1/bfd/config.bfd
+Index: gdb-12.1/bfd/configure
 ===================================================================
---- gdb-8.1.orig/bfd/config.bfd
-+++ gdb-8.1/bfd/config.bfd
-@@ -203,6 +203,7 @@ xtensa*)	 targ_archs=bfd_xtensa_arch ;;
- xgate)		 targ_archs=bfd_xgate_arch ;;
- z80|r800)	 targ_archs=bfd_z80_arch ;;
- z8k*)		 targ_archs=bfd_z8k_arch ;;
-+stm8*)		 targ_archs=bfd_stm8_arch ;;
- *)		 targ_archs=bfd_${targ_cpu}_arch ;;
- esac
- 
-@@ -1850,6 +1851,11 @@ case "${targ}" in
-     targ_underscore=yes
-     ;;
- 
-+  stm8-*-elf*)
-+    targ_defvec=stm8_elf32_vec
-+    targ_underscore=yes
-+    ;;
-+
-   *-*-ieee*)
-     targ_defvec=ieee_vec
-     ;;
-Index: gdb-8.1/bfd/configure
-===================================================================
---- gdb-8.1.orig/bfd/configure
-+++ gdb-8.1/bfd/configure
-@@ -14641,6 +14641,7 @@ do
-     xtensa_elf32_le_vec)	 tb="$tb xtensa-isa.lo xtensa-modules.lo elf32-xtensa.lo elf32.lo $elf" ;;
+--- gdb-12.1.orig/bfd/configure
++++ gdb-12.1/bfd/configure
+@@ -13624,6 +13624,7 @@ do
      z80_coff_vec)		 tb="$tb coff-z80.lo reloc16.lo $coffgen" ;;
+     z80_elf32_vec)		 tb="$tb elf32-z80.lo elf32.lo $elf" ;;
      z8k_coff_vec)		 tb="$tb coff-z8k.lo reloc16.lo $coff" ;;
 +    stm8_elf32_vec)		 tb="$tb elf32-stm8.lo elf32.lo $elf" ;;
  
      # These appear out of order in targets.c
      srec_vec)			 tb="$tb srec.lo" ;;
-Index: gdb-8.1/bfd/configure.ac
+Index: gdb-12.1/bfd/configure.ac
 ===================================================================
---- gdb-8.1.orig/bfd/configure.ac
-+++ gdb-8.1/bfd/configure.ac
-@@ -723,6 +723,7 @@ do
-     xtensa_elf32_le_vec)	 tb="$tb xtensa-isa.lo xtensa-modules.lo elf32-xtensa.lo elf32.lo $elf" ;;
+--- gdb-12.1.orig/bfd/configure.ac
++++ gdb-12.1/bfd/configure.ac
+@@ -703,6 +703,7 @@ do
      z80_coff_vec)		 tb="$tb coff-z80.lo reloc16.lo $coffgen" ;;
+     z80_elf32_vec)		 tb="$tb elf32-z80.lo elf32.lo $elf" ;;
      z8k_coff_vec)		 tb="$tb coff-z8k.lo reloc16.lo $coff" ;;
 +    stm8_elf32_vec)		 tb="$tb elf32-stm8.lo elf32.lo $elf" ;;
  
      # These appear out of order in targets.c
      srec_vec)			 tb="$tb srec.lo" ;;
-Index: gdb-8.1/bfd/cpu-stm8.c
+Index: gdb-12.1/bfd/cpu-stm8.c
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/bfd/cpu-stm8.c
++++ gdb-12.1/bfd/cpu-stm8.c
 @@ -0,0 +1,40 @@
 +/* BFD support for the STM8 processor.
 +   Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -305,16 +217,16 @@ Index: gdb-8.1/bfd/cpu-stm8.c
 +  "stm8",                       /* architecture name */
 +  "stm8",                       /* printable name */
 +  4,                            /* section align power */
-+  TRUE,                         /* the default ? */
++  true,                         /* the default ? */
 +  bfd_default_compatible,       /* architecture comparison fn */
 +  bfd_default_scan,             /* string to architecture convert fn */
 +  bfd_arch_default_fill,
 +  0,
 +};
-Index: gdb-8.1/bfd/cpu-stm8.h
+Index: gdb-12.1/bfd/cpu-stm8.h
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/bfd/cpu-stm8.h
++++ gdb-12.1/bfd/cpu-stm8.h
 @@ -0,0 +1,6 @@
 +#ifndef __CPU_STM8_H
 +#define __CPU_STM8_H
@@ -322,11 +234,11 @@ Index: gdb-8.1/bfd/cpu-stm8.h
 +extern bfd_stm8_arch;
 +
 +#endif
-Index: gdb-8.1/bfd/elf32-stm8.c
+Index: gdb-12.1/bfd/elf32-stm8.c
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/bfd/elf32-stm8.c
-@@ -0,0 +1,285 @@
++++ gdb-12.1/bfd/elf32-stm8.c
+@@ -0,0 +1,283 @@
 +/* STM8-specific support for 32-bit ELF
 +   Copyright (C) 2007-2016 Free Software Foundation, Inc.
 +   Written by Åke Rehnman (at) gmail dot com
@@ -349,14 +261,12 @@ Index: gdb-8.1/bfd/elf32-stm8.c
 +
 +#include "sysdep.h"
 +#include "bfd.h"
-+#include "bfd_stdint.h"
 +#include "libiberty.h"
 +#include "libbfd.h"
 +#include "elf-bfd.h"
 +
 +#include "elf/stm8.h"
 +//#include "elf32-avr.h"
-+#include "bfd_stdint.h"
 +
 +bfd_reloc_status_type
 +bfd_elf_stm8_spec_reloc (bfd *abfd ATTRIBUTE_UNUSED,
@@ -373,104 +283,104 @@ Index: gdb-8.1/bfd/elf32-stm8.c
 +         0,                     /* rightshift */
 +         3,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         0,                     /* bitsize */
-+         FALSE,                 /* pc_relative */
++         false,                 /* pc_relative */
 +         0,                     /* bitpos */
 +         complain_overflow_dont, /* complain_on_overflow */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_NONE",         /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0,                     /* src_mask */
 +         0,                     /* dst_mask */
-+         FALSE),                /* pcrel_offset */
++         false),                /* pcrel_offset */
 +
 +  /* 8 bit offset.  */
 +  HOWTO (R_STM8_8,              /* type */
 +         0,                     /* rightshift */
 +         0,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         8,                     /* bitsize */
-+         FALSE,                 /* pc_relative */
++         false,                 /* pc_relative */
 +         0,                     /* bitpos */
 +         complain_overflow_unsigned,/* complain_on_overflow */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_8",            /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0x0,                   /* src_mask */
 +         0xff,                  /* dst_mask */
-+         FALSE),                /* pcrel_offset */
++         false),                /* pcrel_offset */
 +
 +  /* A 16 bit absolute relocation.  */
 +  HOWTO (R_STM8_16,             /* type */
 +         0,                     /* rightshift */
 +         1,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         16,                    /* bitsize */
-+         FALSE,                 /* pc_relative */
++         false,                 /* pc_relative */
 +         0,                     /* bitpos */
 +         complain_overflow_unsigned,/* complain_on_overflow */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_16",           /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0x0,                   /* src_mask */
 +         0xffff,                /* dst_mask */
-+         FALSE),                /* pcrel_offset */
++         false),                /* pcrel_offset */
 +
 +//use this with unpatched bfd_get_reloc_size
 +  HOWTO (R_STM8_24,             /* type */
 +         0,                     /* rightshift */
 +         2,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         24,                    /* bitsize */
-+         FALSE,                 /* pc_relative */
++         false,                 /* pc_relative */
 +         0,                     /* bitpos */ //the relocation use bfd_get_32 so our relocation end up in the upper 24 bits and so relocation value has to be shifted 8 bits to the left
 +         complain_overflow_unsigned, /* complain_on_overflow */
 +         //bfd_elf_stm8_spec_reloc,     /* special_function */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_24",           /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0xff000000,            /* src_mask */
 +         0x00ffffff,            /* dst_mask */
-+         FALSE),                /* pcrel_offset */
++         false),                /* pcrel_offset */
 +
 +//  HOWTO (R_STM8_24,             /* type */
 +//         0,                     /* rightshift */
 +//         99,                    /* size (0 = byte, 1 = short, 2 = long, 99 = 24 bit) */
 +//         24,                    /* bitsize */
-+//         FALSE,                 /* pc_relative */
++//         false,                 /* pc_relative */
 +//         0,                     /* bitpos */ //the relocation use bfd_get_32 so our relocation end up in the upper 24 bits and so relocation value has to be shifted 8 bits to the left
 +//         complain_overflow_unsigned, /* complain_on_overflow */
 +//         bfd_elf_generic_reloc, /* special_function */
 +//         "R_STM8_24",           /* name */
-+//         FALSE,                 /* partial_inplace */
++//         false,                 /* partial_inplace */
 +//         0x00,                  /* src_mask */
 +//         0xffffff,              /* dst_mask */
-+//         FALSE),                /* pcrel_offset */
++//         false),                /* pcrel_offset */
 +
 +  HOWTO (R_STM8_32,             /* type */
 +         0,                     /* rightshift */
 +         2,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         32,                    /* bitsize */
-+         FALSE,                 /* pc_relative */
++         false,                 /* pc_relative */
 +         0,                     /* bitpos */
 +         complain_overflow_unsigned, /* complain_on_overflow */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_32",           /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0x0,                   /* src_mask */
 +         0xffffffff,            /* dst_mask */
-+         FALSE),                /* pcrel_offset */
++         false),                /* pcrel_offset */
 +
 +  /* A 8 bit PC relative relocation.  */
 +  HOWTO (R_STM8_8_PCREL,        /* type */
 +         0,                     /* rightshift */
 +         0,                     /* size (0 = byte, 1 = short, 2 = long) */
 +         8,                     /* bitsize */
-+         TRUE,                  /* pc_relative */
++         true,                  /* pc_relative */
 +         0,                     /* bitpos */
 +         complain_overflow_signed, /* complain_on_overflow */
 +         bfd_elf_generic_reloc, /* special_function */
 +         "R_STM8_8_PCREL",      /* name */
-+         FALSE,                 /* partial_inplace */
++         false,                 /* partial_inplace */
 +         0x0,                   /* src_mask */
 +         0xff,                  /* dst_mask */
-+         TRUE),                 /* pcrel_offset */
++         true),                 /* pcrel_offset */
 +};
 +
 +//stupid bfd_elf_generic_reloc cant handle 24-bit relocations
@@ -573,12 +483,12 @@ Index: gdb-8.1/bfd/elf32-stm8.c
 +  i_ehdrp->e_ident[EI_ABIVERSION] = 0;
 +}
 +
-+static bfd_boolean
++static bool
 +elf32_stm8_modify_segment_map (bfd *abfd,
 +            struct bfd_link_info *info ATTRIBUTE_UNUSED)
 +{
 +  struct elf_segment_map *m;
-+  return TRUE;
++  return true;
 +  m = elf_seg_map (abfd);
 +  while (m)
 +  {
@@ -586,7 +496,7 @@ Index: gdb-8.1/bfd/elf32-stm8.c
 +  	m->includes_phdrs = 0;
 +  	m = m->next;
 +  }
-+  return TRUE;
++  return true;
 +}
 +
 +
@@ -612,10 +522,10 @@ Index: gdb-8.1/bfd/elf32-stm8.c
 +#define elf_info_to_howto_rel                NULL
 +
 +#include "elf32-target.h"
-Index: gdb-8.1/bfd/elfcode.h
+Index: gdb-12.1/bfd/elfcode.h
 ===================================================================
---- gdb-8.1.orig/bfd/elfcode.h
-+++ gdb-8.1/bfd/elfcode.h
+--- gdb-12.1.orig/bfd/elfcode.h
++++ gdb-12.1/bfd/elfcode.h
 @@ -149,7 +149,7 @@ static void elf_debug_section (int, Elf_
  #if DEBUG & 1
  static void elf_debug_file (Elf_Internal_Ehdr *);
@@ -625,7 +535,7 @@ Index: gdb-8.1/bfd/elfcode.h
  /* Structure swapping routines */
  
  /* Should perhaps use put_offset, put_word, etc.  For now, the two versions
-@@ -459,7 +459,7 @@ elf_swap_dyn_out (bfd *abfd,
+@@ -476,7 +476,7 @@ elf_swap_dyn_out (bfd *abfd,
    H_PUT_WORD (abfd, src->d_tag, dst->d_tag);
    H_PUT_WORD (abfd, src->d_un.d_val, dst->d_un.d_val);
  }
@@ -634,7 +544,7 @@ Index: gdb-8.1/bfd/elfcode.h
  /* ELF .o/exec file reading */
  
  /* Begin processing a given object.
-@@ -847,7 +847,7 @@ elf_object_p (bfd *abfd)
+@@ -877,7 +877,7 @@ elf_object_p (bfd *abfd)
   got_no_match:
    return NULL;
  }
@@ -643,36 +553,36 @@ Index: gdb-8.1/bfd/elfcode.h
  /* ELF .o/exec file writing */
  
  /* Write out the relocs.  */
-@@ -1468,12 +1468,22 @@ elf_slurp_reloc_table_from_section (bfd
+@@ -1518,12 +1518,22 @@ elf_slurp_reloc_table_from_section (bfd
  
        relent->addend = rela.r_addend;
  
 -      if ((entsize == sizeof (Elf_External_Rela)
 -	   && ebd->elf_info_to_howto != NULL)
 -	  || ebd->elf_info_to_howto_rel == NULL)
--	(*ebd->elf_info_to_howto) (abfd, relent, &rela);
+-	res = ebd->elf_info_to_howto (abfd, relent, &rela);
 -      else
--	(*ebd->elf_info_to_howto_rel) (abfd, relent, &rela);
+-	res = ebd->elf_info_to_howto_rel (abfd, relent, &rela);
 +// Ake Rehnman 2017-02-21
 +// bug fixed, preventing call to elf_info_to_howto_rel
 +// if elf_info_to_howto is NULL
 +//      if ((entsize == sizeof (Elf_External_Rela)
 +//	   && ebd->elf_info_to_howto != NULL)
 +//	  || ebd->elf_info_to_howto_rel == NULL)
-+//	(*ebd->elf_info_to_howto) (abfd, relent, &rela);
++//	res = ebd->elf_info_to_howto (abfd, relent, &rela);
 +//      else
-+//	(*ebd->elf_info_to_howto_rel) (abfd, relent, &rela);
++//	res = ebd->elf_info_to_howto_rel (abfd, relent, &rela);
 +      if (entsize == sizeof (Elf_External_Rela))
 +      {
 +	if (ebd->elf_info_to_howto)
-+		(*ebd->elf_info_to_howto) (abfd, relent, &rela);
-+	else if (ebd->elf_info_to_howto_rel)
-+		(*ebd->elf_info_to_howto_rel) (abfd, relent, &rela);
++	  res = ebd->elf_info_to_howto (abfd, relent, &rela);
++        else if (ebd->elf_info_to_howto_rel)
++          res = ebd->elf_info_to_howto_rel (abfd, relent, &rela);
 +      }
-     }
  
-   if (allocated != NULL)
-@@ -1603,7 +1613,7 @@ elf_debug_file (Elf_Internal_Ehdr *ehdrp
+       if (! res || relent->howto == NULL)
+ 	goto error_return;
+@@ -1661,7 +1671,7 @@ elf_debug_file (Elf_Internal_Ehdr *ehdrp
    fprintf (stderr, "e_shentsize  = %ld\n", (long) ehdrp->e_shentsize);
  }
  #endif
@@ -681,7 +591,7 @@ Index: gdb-8.1/bfd/elfcode.h
  /* Create a new BFD as if by bfd_openr.  Rather than opening a file,
     reconstruct an ELF file by reading the segments out of remote
     memory based on the ELF file header at EHDR_VMA and the ELF program
-@@ -1884,9 +1894,9 @@ NAME(elf,r_sym) (bfd_vma r_info)
+@@ -1950,9 +1960,9 @@ NAME(elf,r_sym) (bfd_vma r_info)
  {
    return ELF_R_SYM (r_info);
  }
@@ -693,25 +603,25 @@ Index: gdb-8.1/bfd/elfcode.h
  /* Size-dependent data and functions.  */
  const struct elf_size_info NAME(_bfd_elf,size_info) = {
    sizeof (Elf_External_Ehdr),
-Index: gdb-8.1/bfd/libbfd.h
+Index: gdb-12.1/bfd/libbfd.h
 ===================================================================
---- gdb-8.1.orig/bfd/libbfd.h
-+++ gdb-8.1/bfd/libbfd.h
-@@ -3188,6 +3188,7 @@ static const char *const bfd_reloc_code_
-   "BFD_RELOC_WASM32_CODE_POINTER",
-   "BFD_RELOC_WASM32_INDEX",
-   "BFD_RELOC_WASM32_PLT_SIG",
+--- gdb-12.1.orig/bfd/libbfd.h
++++ gdb-12.1/bfd/libbfd.h
+@@ -3460,6 +3460,7 @@ static const char *const bfd_reloc_code_
+   "BFD_RELOC_LARCH_SUB24",
+   "BFD_RELOC_LARCH_SUB32",
+   "BFD_RELOC_LARCH_SUB64",
 +  "BFD_RELOC_STM8_BIT_FLD",
   "@@overflow: BFD_RELOC_UNUSED@@",
  };
  #endif
-Index: gdb-8.1/bfd/reloc.c
+Index: gdb-12.1/bfd/reloc.c
 ===================================================================
---- gdb-8.1.orig/bfd/reloc.c
-+++ gdb-8.1/bfd/reloc.c
-@@ -7931,6 +7931,11 @@ ENUMX
+--- gdb-12.1.orig/bfd/reloc.c
++++ gdb-12.1/bfd/reloc.c
+@@ -8262,6 +8262,11 @@ ENUMX
  ENUMDOC
-   WebAssembly relocations.
+   LARCH relocations.
  
 +ENUM
 +  BFD_RELOC_STM8_BIT_FLD
@@ -721,57 +631,47 @@ Index: gdb-8.1/bfd/reloc.c
  ENDSENUM
    BFD_RELOC_UNUSED
  CODE_FRAGMENT
-Index: gdb-8.1/bfd/targets.c
+Index: gdb-12.1/bfd/targets.c
 ===================================================================
---- gdb-8.1.orig/bfd/targets.c
-+++ gdb-8.1/bfd/targets.c
-@@ -930,6 +930,7 @@ extern const bfd_target xtensa_elf32_be_
- extern const bfd_target xtensa_elf32_le_vec;
+--- gdb-12.1.orig/bfd/targets.c
++++ gdb-12.1/bfd/targets.c
+@@ -945,6 +945,7 @@ extern const bfd_target xtensa_elf32_le_
  extern const bfd_target z80_coff_vec;
+ extern const bfd_target z80_elf32_vec;
  extern const bfd_target z8k_coff_vec;
 +extern const bfd_target stm8_elf32_vec;
  
  /* These are always included.  */
  extern const bfd_target srec_vec;
-@@ -1174,6 +1175,7 @@ static const bfd_target * const _bfd_tar
+@@ -1145,6 +1146,7 @@ static const bfd_target * const _bfd_tar
  
  	&m68hc11_elf32_vec,
  	&m68hc12_elf32_vec,
 +	&stm8_elf32_vec,
  
- #if 0
- 	&m68k_aout_4knbsd_vec,
-Index: gdb-8.1/config.sub
+ 	&m68k_elf32_vec,
+ 
+Index: gdb-12.1/config.sub
 ===================================================================
---- gdb-8.1.orig/config.sub
-+++ gdb-8.1/config.sub
-@@ -318,7 +318,8 @@ case $basic_machine in
- 	| wasm32 \
- 	| we32k \
- 	| x86 | xc16x | xstormy16 | xtensa \
--	| z8k | z80)
-+	| z8k | z80 \
-+	| stm8)
- 		basic_machine=$basic_machine-unknown
- 		;;
- 	c54x)
-@@ -452,7 +453,8 @@ case $basic_machine in
- 	| x86-* | x86_64-* | xc16x-* | xps100-* \
- 	| xstormy16-* | xtensa*-* \
- 	| ymp-* \
--	| z8k-* | z80-*)
-+	| z8k-* | z80-* \
-+	| stm8-*)
- 		;;
- 	# Recognize the basic CPU types without company name, with glob match.
- 	xtensa*)
-Index: gdb-8.1/gdb/configure.tgt
+--- gdb-12.1.orig/config.sub
++++ gdb-12.1/config.sub
+@@ -1281,7 +1281,8 @@ case $cpu-$vendor in
+ 			| x86 | x86_64 | xc16x | xgate | xps100 \
+ 			| xstormy16 | xtensa* \
+ 			| ymp \
+-			| z8k | z80)
++			| z8k | z80 \
++			| stm8)
+ 				;;
+ 
+ 			*)
+Index: gdb-12.1/gdb/configure.tgt
 ===================================================================
---- gdb-8.1.orig/gdb/configure.tgt
-+++ gdb-8.1/gdb/configure.tgt
-@@ -744,6 +744,11 @@ xtensa*-*-linux*)	gdb_target=linux
- 	gdb_target_obs="xtensa-linux-tdep.o symfile-mem.o linux-tdep.o"
- 	build_gdbserver=yes
+--- gdb-12.1.orig/gdb/configure.tgt
++++ gdb-12.1/gdb/configure.tgt
+@@ -737,6 +737,11 @@ z80*)
+ 	# Target: Z80
+ 	gdb_target_obs="z80-tdep.o"
  	;;
 +stm8-*-*)
 +	# Target: STM8
@@ -781,10 +681,10 @@ Index: gdb-8.1/gdb/configure.tgt
  
  esac
  
-Index: gdb-8.1/gdb/stm8-tdep.c
+Index: gdb-12.1/gdb/stm8-tdep.c
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/gdb/stm8-tdep.c
++++ gdb-12.1/gdb/stm8-tdep.c
 @@ -0,0 +1,1130 @@
 +/* Target-dependent code for STM8, for GDB.
 +   Written by Ake Rehnman 2017-02-21,
@@ -1916,11 +1816,11 @@ Index: gdb-8.1/gdb/stm8-tdep.c
 +&setdebuglist, &showdebuglist);
 +
 +}
-Index: gdb-8.1/include/dis-asm.h
+Index: gdb-12.1/include/dis-asm.h
 ===================================================================
---- gdb-8.1.orig/include/dis-asm.h
-+++ gdb-8.1/include/dis-asm.h
-@@ -248,6 +248,7 @@ extern int print_insn_rl78		(bfd_vma, di
+--- gdb-12.1.orig/include/dis-asm.h
++++ gdb-12.1/include/dis-asm.h
+@@ -293,6 +293,7 @@ extern int print_insn_rl78		(bfd_vma, di
  extern int print_insn_rl78_g10		(bfd_vma, disassemble_info *);
  extern int print_insn_rl78_g13		(bfd_vma, disassemble_info *);
  extern int print_insn_rl78_g14		(bfd_vma, disassemble_info *);
@@ -1928,10 +1828,10 @@ Index: gdb-8.1/include/dis-asm.h
  
  extern disassembler_ftype arc_get_disassembler (bfd *);
  extern disassembler_ftype cris_get_disassembler (bfd *);
-Index: gdb-8.1/include/elf/stm8.h
+Index: gdb-12.1/include/elf/stm8.h
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/include/elf/stm8.h
++++ gdb-12.1/include/elf/stm8.h
 @@ -0,0 +1,38 @@
 +/* STM8 ELF support for BFD.
 +   Written by Ake Rehnman 2017-02-21,
@@ -1971,10 +1871,10 @@ Index: gdb-8.1/include/elf/stm8.h
 +END_RELOC_NUMBERS (R_STM8_max)
 +
 +#endif /* _ELF_STM_H */
-Index: gdb-8.1/include/opcode/stm8.h
+Index: gdb-12.1/include/opcode/stm8.h
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/include/opcode/stm8.h
++++ gdb-12.1/include/opcode/stm8.h
 @@ -0,0 +1,82 @@
 +/* include/opcode/stm8.h -- Assembler for the STM8.
 +   Written by Ake Rehnman 2017-02-21,
@@ -2058,11 +1958,11 @@ Index: gdb-8.1/include/opcode/stm8.h
 +extern unsigned int stm8_opcode_size(unsigned int number);
 +
 +#endif /* _STM8_H_ */
-Index: gdb-8.1/opcodes/Makefile.am
+Index: gdb-12.1/opcodes/Makefile.am
 ===================================================================
---- gdb-8.1.orig/opcodes/Makefile.am
-+++ gdb-8.1/opcodes/Makefile.am
-@@ -274,7 +274,9 @@ TARGET_LIBOPCODES_CFILES = \
+--- gdb-12.1.orig/opcodes/Makefile.am
++++ gdb-12.1/opcodes/Makefile.am
+@@ -276,7 +276,9 @@ TARGET32_LIBOPCODES_CFILES = \
  	xgate-dis.c \
  	xgate-opc.c \
  	z80-dis.c \
@@ -2073,11 +1973,11 @@ Index: gdb-8.1/opcodes/Makefile.am
  
  # C source files that correspond to .o's ending up in libopcodes.
  LIBOPCODES_CFILES = \
-Index: gdb-8.1/opcodes/Makefile.in
+Index: gdb-12.1/opcodes/Makefile.in
 ===================================================================
---- gdb-8.1.orig/opcodes/Makefile.in
-+++ gdb-8.1/opcodes/Makefile.in
-@@ -576,7 +576,9 @@ TARGET_LIBOPCODES_CFILES = \
+--- gdb-12.1.orig/opcodes/Makefile.in
++++ gdb-12.1/opcodes/Makefile.in
+@@ -668,7 +668,9 @@ TARGET32_LIBOPCODES_CFILES = \
  	xgate-dis.c \
  	xgate-opc.c \
  	z80-dis.c \
@@ -2088,7 +1988,7 @@ Index: gdb-8.1/opcodes/Makefile.in
  
  
  # C source files that correspond to .o's ending up in libopcodes.
-@@ -953,6 +955,8 @@ distclean-compile:
+@@ -1056,6 +1058,8 @@ distclean-compile:
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sparc-opc.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spu-dis.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spu-opc.Plo@am__quote@
@@ -2097,42 +1997,42 @@ Index: gdb-8.1/opcodes/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tic30-dis.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tic4x-dis.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tic54x-dis.Plo@am__quote@
-Index: gdb-8.1/opcodes/configure
+Index: gdb-12.1/opcodes/configure
 ===================================================================
---- gdb-8.1.orig/opcodes/configure
-+++ gdb-8.1/opcodes/configure
-@@ -12732,6 +12732,7 @@ if test x${all_targets} = xfalse ; then
- 	bfd_xtensa_arch)	ta="$ta xtensa-dis.lo" ;;
- 	bfd_z80_arch)		ta="$ta z80-dis.lo" ;;
+--- gdb-12.1.orig/opcodes/configure
++++ gdb-12.1/opcodes/configure
+@@ -12576,6 +12576,7 @@ if test x${all_targets} = xfalse ; then
  	bfd_z8k_arch)		ta="$ta z8k-dis.lo" ;;
+ 	bfd_bpf_arch)		ta="$ta bpf-asm.lo bpf-desc.lo bpf-dis.lo bpf-ibld.lo bpf-opc.lo" using_cgen=yes ;;
+ 	bfd_loongarch_arch)	ta="$ta loongarch-dis.lo loongarch-opc.lo loongarch-coder.lo" ;;
 +	bfd_stm8_arch)		ta="$ta stm8-dis.lo stm8-opc.lo" ;;
  
  	"")			;;
- 	*)		as_fn_error "*** unknown target architecture $arch" "$LINENO" 5 ;;
-Index: gdb-8.1/opcodes/configure.ac
+ 	*)		as_fn_error $? "*** unknown target architecture $arch" "$LINENO" 5 ;;
+Index: gdb-12.1/opcodes/configure.ac
 ===================================================================
---- gdb-8.1.orig/opcodes/configure.ac
-+++ gdb-8.1/opcodes/configure.ac
-@@ -356,6 +356,7 @@ if test x${all_targets} = xfalse ; then
- 	bfd_xtensa_arch)	ta="$ta xtensa-dis.lo" ;;
- 	bfd_z80_arch)		ta="$ta z80-dis.lo" ;;
+--- gdb-12.1.orig/opcodes/configure.ac
++++ gdb-12.1/opcodes/configure.ac
+@@ -348,6 +348,7 @@ if test x${all_targets} = xfalse ; then
  	bfd_z8k_arch)		ta="$ta z8k-dis.lo" ;;
+ 	bfd_bpf_arch)		ta="$ta bpf-asm.lo bpf-desc.lo bpf-dis.lo bpf-ibld.lo bpf-opc.lo" using_cgen=yes ;;
+ 	bfd_loongarch_arch)	ta="$ta loongarch-dis.lo loongarch-opc.lo loongarch-coder.lo" ;;
 +	bfd_stm8_arch)		ta="$ta stm8-dis.lo stm8-opc.lo" ;;
  
  	"")			;;
  	*)		AC_MSG_ERROR(*** unknown target architecture $arch) ;;
-Index: gdb-8.1/opcodes/disassemble.c
+Index: gdb-12.1/opcodes/disassemble.c
 ===================================================================
---- gdb-8.1.orig/opcodes/disassemble.c
-+++ gdb-8.1/opcodes/disassemble.c
-@@ -102,6 +102,7 @@
+--- gdb-12.1.orig/opcodes/disassemble.c
++++ gdb-12.1/opcodes/disassemble.c
+@@ -103,6 +103,7 @@
  #define ARCH_xtensa
  #define ARCH_z80
  #define ARCH_z8k
 +#define ARCH_stm8
- #define INCLUDE_SHMEDIA
  #endif
  
+ #ifdef ARCH_m32c
 @@ -515,6 +516,11 @@ disassembler (enum bfd_architecture a,
  	disassemble = print_insn_z8002;
        break;
@@ -2145,10 +2045,10 @@ Index: gdb-8.1/opcodes/disassemble.c
  #ifdef ARCH_vax
      case bfd_arch_vax:
        disassemble = print_insn_vax;
-Index: gdb-8.1/opcodes/stm8-dis.c
+Index: gdb-12.1/opcodes/stm8-dis.c
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/opcodes/stm8-dis.c
++++ gdb-12.1/opcodes/stm8-dis.c
 @@ -0,0 +1,412 @@
 +/* Disassemble STM8 instructions.
 +   Copyright (C) 1999-2016 Free Software Foundation, Inc.
@@ -2562,10 +2462,10 @@ Index: gdb-8.1/opcodes/stm8-dis.c
 +	}
 +	return instrlen;
 +}
-Index: gdb-8.1/opcodes/stm8-opc.c
+Index: gdb-12.1/opcodes/stm8-opc.c
 ===================================================================
 --- /dev/null
-+++ gdb-8.1/opcodes/stm8-opc.c
++++ gdb-12.1/opcodes/stm8-opc.c
 @@ -0,0 +1,799 @@
 +/* stm8-opc.c -- Table of opcodes for the STM8 processor.
 +   Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -3366,3 +3266,27 @@ Index: gdb-8.1/opcodes/stm8-opc.c
 +	ret += stm8_opcode_size(opcode.bin_opcode);
 +	return(ret);
 +}
+Index: gdb-12.1/bfd/config.bfd
+===================================================================
+--- gdb-12.1.orig/bfd/config.bfd
++++ gdb-12.1/bfd/config.bfd
+@@ -230,6 +230,7 @@ xtensa*)	 targ_archs=bfd_xtensa_arch ;;
+ xgate)		 targ_archs=bfd_xgate_arch ;;
+ z80*|r800|z180|gbz80|ez80*)	 targ_archs=bfd_z80_arch ;;
+ z8k*)		 targ_archs=bfd_z8k_arch ;;
++stm8*)		 targ_archs=bfd_stm8_arch ;;
+ *)		 targ_archs=bfd_${targ_cpu}_arch ;;
+ esac
+ 
+@@ -1465,6 +1466,11 @@ case "${targ}" in
+     targ_underscore=yes
+     ;;
+ 
++  stm8-*-elf*)
++    targ_defvec=stm8_elf32_vec
++    targ_underscore=yes
++    ;;
++
+ #ifdef BFD64
+   loongarch32-*)
+     targ_defvec=loongarch_elf32_vec

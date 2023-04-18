@@ -1,0 +1,101 @@
+From 829ec037e9e4964789bf70ede0b09f0443eb30d3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C3=85ke=20Rehnman?= <ake_rehnman_at_gmail_com>
+Date: Mon, 16 Mar 2020 15:25:10 +0100
+Subject: [PATCH 13/18] Implemented .s short addressing mode modifer to index
+ and ptr operands
+
+---
+ bfd/bfd-in2.h        |  10 +-
+ gas/config/tc-stm8.c | 224 +++++++++++++++++++++++++++++++------------
+ opcodes/stm8-dis.c   |  18 ++--
+ 3 files changed, 180 insertions(+), 72 deletions(-)
+
+Index: gdb-12.1/bfd/bfd-in2.h
+===================================================================
+--- gdb-12.1.orig/bfd/bfd-in2.h
++++ gdb-12.1/bfd/bfd-in2.h
+@@ -6333,13 +6333,15 @@ assembler and not (currently) written to
+ 
+ /* STM8 bit field immediate for BTJx, BCPL, BSET, BRES  instruction.  */
+   BFD_RELOC_STM8_BIT_FLD,
+-/* STM8 extract LSB from word. */
++
++/* STM8 extract LSB from word.  */
+   BFD_RELOC_STM8_LO8,
+-/* STM8 extract MSB from word. */
++
++/* STM8 extract MSB from word.  */
+   BFD_RELOC_STM8_HI8,
+-/* STM8 extract MMSB from 24-bit address. */
+-  BFD_RELOC_STM8_HH8,
+ 
++/* STM8 extract MMSB from 24-bit address.  */
++  BFD_RELOC_STM8_HH8,
+   BFD_RELOC_UNUSED };
+ 
+ typedef enum bfd_reloc_code_real bfd_reloc_code_real_type;
+Index: gdb-12.1/opcodes/stm8-dis.c
+===================================================================
+--- gdb-12.1.orig/opcodes/stm8-dis.c
++++ gdb-12.1/opcodes/stm8-dis.c
+@@ -157,7 +157,7 @@ int stm8_operands(char *s, unsigned char
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"%s",sym);
++			sprintf(s,"%s.s",sym);
+ 		else
+ 			sprintf(s,"0x%2.2x",val);
+ 		return 1;
+@@ -169,7 +169,7 @@ int stm8_operands(char *s, unsigned char
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"(%s,X)",sym);
++			sprintf(s,"(%s.s,X)",sym);
+ 		else
+ 			sprintf(s,"(0x%2.2x,X)",val);
+ 		return 1;
+@@ -181,7 +181,7 @@ int stm8_operands(char *s, unsigned char
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"(%s,Y)",sym);
++			sprintf(s,"(%s.s,Y)",sym);
+ 		else
+ 			sprintf(s,"(0x%2.2x,Y)",val);
+ 		return 1;
+@@ -199,27 +199,27 @@ int stm8_operands(char *s, unsigned char
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"[%s.w]",sym);
++			sprintf(s,"[%s.s]",sym);
+ 		else
+-			sprintf(s,"[0x%2.2x.w]",val);
++			sprintf(s,"[0x%2.2x]",val);
+ 		return 1;
+ 		break;
+ 	case ST8_SHORTPTRW_X:
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"([%s.w],X)",sym);
++			sprintf(s,"([%s.s],X)",sym);
+ 		else
+-			sprintf(s,"([0x%2.2x.w],X)",val);
++			sprintf(s,"([0x%2.2x],X)",val);
+ 		return 1;
+ 		break;
+ 	case ST8_SHORTPTRW_Y:
+ 		val = buf[0];
+ 		sym = find_symbol(val);
+ 		if (sym)
+-			sprintf(s,"([%s.w],Y)",sym);
++			sprintf(s,"([%s.s],Y)",sym);
+ 		else
+-			sprintf(s,"([0x%2.2x.w],Y)",val);
++			sprintf(s,"([0x%2.2x],Y)",val);
+ 		return 1;
+ 		break;
+ 	case ST8_LONGMEM:

@@ -43,5 +43,5 @@ S=${WORKDIR}/gdb-8.1
 CTARGET=stm8-none-elf32
 
 src_configure() {
-    ./configure --build=${CHOST} --host=${CHOST} --target=${CTARGET} --program-prefix=stm8- --prefix="${EPREFIX}"/usr --includedir="${EPREFIX}"/usr/${CTARGET}/include --datarootdir="${EPREFIX}"/usr/${CTARGET}/share
+	./configure --build=${CHOST} --host=${CHOST} --target=${CTARGET} --program-prefix=stm8- --prefix="${EPREFIX}"/usr --includedir="${EPREFIX}"/usr/${CTARGET}/include --datarootdir="${EPREFIX}"/usr/${CTARGET}/share
 }
