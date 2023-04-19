@@ -109,7 +109,6 @@ PATCHES=(
 	"${FILESDIR}"/${P}-readline-8.2-build.patch
 	"${FILESDIR}"/${P}-core-file-detach.patch
 	"${FILESDIR}"/${P}-configure-clang16.patch
-#	"${FILESDIR}"/${P}-fix-compilation-warnings.patch
 )
 
 S=${WORKDIR}/gdb-12.1
