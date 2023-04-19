@@ -823,7 +823,7 @@ Index: gdb-8.1/gdb/stm8-tdep.c
 +#include "objfiles.h"
 +#include "target-descriptions.h"
 +#include <algorithm>
-+#include "dwarf2/frame.h"
++#include "dwarf2-frame.h"
 +
 +enum stm8_regnum
 +{

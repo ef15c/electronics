@@ -21,7 +21,7 @@ Index: gdb-8.1/gdb/stm8-tdep.c
  #include "objfiles.h"
  #include "target-descriptions.h"
 -#include <algorithm>
- #include "dwarf2/frame.h"
+ #include "dwarf2-frame.h"
  
  enum stm8_regnum
 @@ -279,7 +278,7 @@ stm8_breakpoint_kind_from_pc (struct gdb
