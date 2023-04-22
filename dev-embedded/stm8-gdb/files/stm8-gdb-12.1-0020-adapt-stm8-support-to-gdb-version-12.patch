@@ -1,7 +1,7 @@
 Index: gdb-12.1/gdb/stm8-tdep.c
 ===================================================================
---- gdb-12.1.orig/gdb/stm8-tdep.c	2023-04-19 09:28:05.797945468 +0200
-+++ gdb-12.1/gdb/stm8-tdep.c	2023-04-19 10:11:29.382504929 +0200
+--- gdb-12.1.orig/gdb/stm8-tdep.c	2023-04-19 14:28:19.695627084 +0200
++++ gdb-12.1/gdb/stm8-tdep.c	2023-04-22 13:27:16.754059408 +0200
 @@ -4,6 +4,9 @@
  
     Copyright (C) 1996-2018 Free Software Foundation, Inc.
@@ -232,7 +232,14 @@ Index: gdb-12.1/gdb/stm8-tdep.c
    static int * t;
  
    if (stm8_get_producer() == SDCC_PRODUCER)
-@@ -433,7 +428,7 @@
+@@ -427,13 +422,14 @@
+ 	regcache_cooked_write_unsigned (regcache, STM8_PC_REGNUM, pc);
+ }
+ 
++#if 0
+ static CORE_ADDR
+ stm8_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
+ {
  	gdb_byte buf[4];
  	CORE_ADDR pc;
  
@@ -241,7 +248,16 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  	frame_unwind_register (next_frame, STM8_PC_REGNUM, buf);
  	if (frame_relative_level(next_frame) < 0)
  		pc = extract_typed_address (buf, builtin_type (gdbarch)->builtin_func_ptr);
-@@ -481,7 +476,7 @@
+@@ -455,7 +451,7 @@
+ 		fprintf_unfiltered (gdb_stdlog, "stm8_unwind_sp called: sp=%8.8lx\n", (unsigned long)sp);
+ 	return sp;
+ }
+-
++#endif
+ 
+ /* Allocate and initialize a frame cache.  */
+ 
+@@ -481,7 +477,7 @@
  stm8_get_return_insn (CORE_ADDR pc)
  {
  	const char *name;
@@ -250,7 +266,43 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
  	if (find_pc_partial_function (pc, &name, &func_addr, &func_end))
  	{
-@@ -729,12 +724,14 @@
+@@ -683,13 +679,13 @@
+  */
+ 
+ static struct stm8_frame_cache *
+-stm8_frame_cache (struct frame_info *next_frame, void **this_cache)
++stm8_frame_cache (struct frame_info *this_frame, void **this_cache)
+ {
+ 	if (stm8_debug)
+-		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache called (next_frame=%p)\n", next_frame);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache called (this_frame=%p)\n", this_frame);
+ 
+ 	struct stm8_frame_cache *cache;
+-	struct gdbarch *gdbarch = get_frame_arch (next_frame);
++	struct gdbarch *gdbarch = get_frame_arch (this_frame);
+ 	CORE_ADDR start_pc, current_pc, current_sp;
+ 	int retsize;
+ 
+@@ -699,14 +695,14 @@
+ 	cache = stm8_alloc_frame_cache ();
+ 	*this_cache = cache;
+ 
+-	cache->saved_regs = trad_frame_alloc_saved_regs (next_frame);
++	cache->saved_regs = trad_frame_alloc_saved_regs (this_frame);
+ 
+-	start_pc = get_frame_func (next_frame);
++	start_pc = get_frame_func (this_frame);
+ 
+ 	cache->return_kind = stm8_get_return_insn (start_pc);
+ 
+-	current_pc = get_frame_pc (next_frame);
+-	current_sp = get_frame_sp (next_frame);
++	current_pc = get_frame_pc (this_frame);
++	current_sp = get_frame_sp (this_frame);
+ 
+ 	/* Analyze the function prologue.  */
+ 	if (start_pc != 0)
+@@ -729,26 +725,28 @@
  
  	cache->base = current_sp;
  	if (cache->return_kind == RETURN_IRET)
@@ -265,23 +317,64 @@ Index: gdb-12.1/gdb/stm8-tdep.c
 +//	trad_frame_set_value (cache->saved_regs,
 +//			STM8_SP_REGNUM,
 +//			cache->base+retsize);
-+	cache->saved_regs[STM8_PC_REGNUM].set_value ( cache->base+retsize );
++	cache->saved_regs[STM8_PC_REGNUM].set_addr( cache->base+retsize );
 +
  
  	if (stm8_debug)
  	{
-@@ -747,8 +744,8 @@
- 		frame_sp =  value_as_long(trad_frame_get_prev_register (next_frame, cache->saved_regs, STM8_SP_REGNUM));
+-		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) base=%4.4lx curr_pc=%4.4lx curr_sp=%4.4lx framesize=%4.4x stackadj=%4.4x retsize=%d\n",
+-				next_frame, (unsigned long)cache->base, (unsigned long)current_pc, (unsigned long)current_sp, cache->framesize, cache->stackadj, retsize);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (this_frame=%p) base=%4.4lx curr_pc=%4.4lx curr_sp=%4.4lx framesize=%4.4x stackadj=%4.4x retsize=%d\n",
++				this_frame, (unsigned long)cache->base, (unsigned long)current_pc, (unsigned long)current_sp, cache->framesize, cache->stackadj, retsize);
+ 
+ 		CORE_ADDR frame_pc;
+ 		CORE_ADDR frame_sp;
+-		frame_pc = value_as_long(trad_frame_get_prev_register (next_frame, cache->saved_regs, STM8_PC_REGNUM));
+-		frame_sp =  value_as_long(trad_frame_get_prev_register (next_frame, cache->saved_regs, STM8_SP_REGNUM));
++		frame_pc = value_as_long(trad_frame_get_prev_register (this_frame, cache->saved_regs, STM8_PC_REGNUM));
++		frame_sp =  value_as_long(trad_frame_get_prev_register (this_frame, cache->saved_regs, STM8_SP_REGNUM));
  
  		frame_pc = frame_pc >> 16;
 -		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) pc=%8.8lx *pc=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr, (unsigned long)frame_pc);
 -		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) sp=%8.8lx *sp=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr, (unsigned long)frame_sp);
-+		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) pc=%8.8lx *pc=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr(), (unsigned long)frame_pc);
-+		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (next_frame=%p) sp=%8.8lx *sp=%8.8lx\n", next_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr(), (unsigned long)frame_sp);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (this_frame=%p) pc=%8.8lx *pc=%8.8lx\n", this_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr(), (unsigned long)frame_pc);
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_cache: (this_frame=%p) sp=%8.8lx *sp=%8.8lx\n", this_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr(), (unsigned long)frame_sp);
  	}
  
  	return (struct stm8_frame_cache *) (*this_cache);
-@@ -803,13 +800,13 @@
+@@ -757,15 +755,18 @@
+ /* Given a GDB frame, determine the address of the calling function's
+    frame.  This will be used to create a new GDB frame struct.  */
+ static void
+-stm8_frame_this_id (struct frame_info *next_frame, void **this_cache,
++stm8_frame_this_id (struct frame_info *this_frame, void **this_cache,
+ 		struct frame_id *this_id)
+ {
++	if (stm8_debug)
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_this_id called (this_frame=%p)\n", this_frame);
++
+ 	struct stm8_frame_cache *cache =
+-			stm8_frame_cache (next_frame, this_cache);
++			stm8_frame_cache (this_frame, this_cache);
+ 	CORE_ADDR func;
+ 	CORE_ADDR base;
+ 
+-	func = get_frame_func (next_frame);
++	func = get_frame_func (this_frame);
+ 	base = cache->base;
+ 
+ 	/* This marks the outermost frame.  */
+@@ -782,6 +783,9 @@
+ stm8_frame_prev_register (struct frame_info *this_frame,
+ 		void **this_cache, int regnum)
+ {
++	if (stm8_debug)
++		fprintf_unfiltered (gdb_stdlog, "stm8_frame_prev_register called (this_frame=%p)\n", this_frame);
++
+ 	struct value *value;
+ 	struct stm8_frame_cache *info = stm8_frame_cache (this_frame,
+ 			this_cache);
+@@ -803,13 +807,13 @@
  	len = TYPE_LENGTH (type);
  
  	if (len == 1)
@@ -299,7 +392,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  	}
  	else
  		error (_("return of value > 4 is not supported."));
-@@ -827,19 +824,19 @@
+@@ -827,19 +831,19 @@
  	switch (TYPE_LENGTH (type))
  	{
  	case 1:
@@ -323,7 +416,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  		memcpy (valbuf, buf, 2);
  		break;
  
-@@ -853,9 +850,9 @@
+@@ -853,9 +857,9 @@
  		struct type *valtype, struct regcache *regcache,
  		gdb_byte *readbuf, const gdb_byte *writebuf)
  {
@@ -336,7 +429,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  			|| TYPE_LENGTH (valtype) > 4)
  		return RETURN_VALUE_STRUCT_CONVENTION;
  	else
-@@ -869,6 +866,7 @@
+@@ -869,6 +873,7 @@
  }
  
  static const struct frame_unwind stm8_frame_unwind = {
@@ -344,7 +437,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  		NORMAL_FRAME,
  		default_frame_unwind_stop_reason,
  		stm8_frame_this_id,
-@@ -877,89 +875,21 @@
+@@ -877,89 +882,21 @@
  		default_frame_sniffer
  };
  
@@ -437,7 +530,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  	  stm8_initialize_soft_register_info(tdep);
  	  return arches->gdbarch;
    }
-@@ -971,7 +901,6 @@
+@@ -971,7 +908,6 @@
      {
        const struct tdesc_feature *feature;
        int valid_p;
@@ -445,7 +538,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
        feature = tdesc_find_feature (tdesc,
  				    "org.gnu.gdb.stm8.core");
-@@ -981,17 +910,14 @@
+@@ -981,17 +917,14 @@
  
        valid_p = 1;
        for (int i = 0; i < STM8_NUM_REGS; i++)
@@ -465,7 +558,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
    gdbarch = gdbarch_alloc (&info, tdep);
  
    /* Initialize soft registers */
-@@ -1015,8 +941,8 @@
+@@ -1015,8 +948,8 @@
    set_gdbarch_pc_regnum (gdbarch, STM8_PC_REGNUM);
    set_gdbarch_ps_regnum (gdbarch, STM8_CC_REGNUM);
  
@@ -476,7 +569,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
    /* Map Dwarf2 registers to GDB registers.  */
    set_gdbarch_dwarf2_reg_to_regnum (gdbarch, stm8_dwarf2_reg_to_regnum);
-@@ -1038,7 +964,7 @@
+@@ -1038,12 +971,14 @@
  
    //set_gdbarch_frame_args_skip (gdbarch, 8);
  
@@ -485,7 +578,22 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
    set_gdbarch_write_pc (gdbarch, stm8_write_pc);
  
-@@ -1064,9 +990,10 @@
++#if 0
+   set_gdbarch_unwind_pc (gdbarch, stm8_unwind_pc);
+   set_gdbarch_unwind_sp (gdbarch, stm8_unwind_sp);
++#endif
+   ////set_gdbarch_dummy_id (gdbarch, stm8_dummy_id);
+ 
+   ////frame_base_set_default (gdbarch, &stm8_frame_base);
+@@ -1053,6 +988,7 @@
+ 
+   //dwarf2 cfi unwinder
+   //dwarf2_frame_set_init_reg (gdbarch, stm8_dwarf2_frame_init_reg);
++  set_gdbarch_dwarf2_addr_size (gdbarch, 4);
+ 
+   dwarf2_append_unwinders (gdbarch);
+   frame_unwind_append_unwinder (gdbarch, &stm8_frame_unwind);
+@@ -1064,9 +1000,10 @@
  //
    tdep->void_type = arch_type (gdbarch, TYPE_CODE_VOID, TARGET_CHAR_BIT, "void");
    tdep->func_void_type = make_function_type (tdep->void_type, NULL);
@@ -499,7 +607,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
  //  set_gdbarch_short_bit (gdbarch, 2 * TARGET_CHAR_BIT);
  //  set_gdbarch_int_bit (gdbarch, 2 * TARGET_CHAR_BIT);
-@@ -1099,7 +1026,7 @@
+@@ -1099,7 +1036,7 @@
  //
  
    if (tdesc_data != NULL)
@@ -508,7 +616,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
  
    return gdbarch;
  }
-@@ -1111,10 +1038,10 @@
+@@ -1111,10 +1048,10 @@
  	fprintf_filtered (file, _("stm8 debugging is %s.\n"), value);
  }
  
@@ -524,7 +632,7 @@ Index: gdb-12.1/gdb/stm8-tdep.c
 Index: gdb-12.1/gdb/features/stm8.xml
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-12.1/gdb/features/stm8.xml	2023-04-19 09:29:00.032705003 +0200
++++ gdb-12.1/gdb/features/stm8.xml	2023-04-19 14:29:45.530814704 +0200
 @@ -0,0 +1,12 @@
 +<?xml version="1.0"?>
 +<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
@@ -541,7 +649,7 @@ Index: gdb-12.1/gdb/features/stm8.xml
 Index: gdb-12.1/gdb/features/Makefile
 ===================================================================
 --- gdb-12.1.orig/gdb/features/Makefile	2022-05-01 20:46:31.000000000 +0200
-+++ gdb-12.1/gdb/features/Makefile	2023-04-19 09:29:00.032705003 +0200
++++ gdb-12.1/gdb/features/Makefile	2023-04-19 14:29:45.530814704 +0200
 @@ -164,7 +164,8 @@
  	s390x-vx-linux64.xml \
  	s390-gs-linux64.xml \
@@ -555,7 +663,7 @@ Index: gdb-12.1/gdb/features/Makefile
 Index: gdb-12.1/gdb/features/stm8.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-12.1/gdb/features/stm8.c	2023-04-19 10:21:05.193418016 +0200
++++ gdb-12.1/gdb/features/stm8.c	2023-04-19 14:29:45.530814704 +0200
 @@ -0,0 +1,36 @@
 +/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
 +  Original: stm8.xml */
@@ -595,8 +703,8 @@ Index: gdb-12.1/gdb/features/stm8.c
 +}
 Index: gdb-12.1/bfd/cpu-stm8.c
 ===================================================================
---- gdb-12.1.orig/bfd/cpu-stm8.c	2023-04-19 09:28:05.659943538 +0200
-+++ gdb-12.1/bfd/cpu-stm8.c	2023-04-19 09:29:00.033705017 +0200
+--- gdb-12.1.orig/bfd/cpu-stm8.c	2023-04-19 14:28:19.556625159 +0200
++++ gdb-12.1/bfd/cpu-stm8.c	2023-04-19 14:29:45.530814704 +0200
 @@ -37,5 +37,6 @@
    bfd_default_compatible,       /* architecture comparison fn */
    bfd_default_scan,             /* string to architecture convert fn */
@@ -606,9 +714,32 @@ Index: gdb-12.1/bfd/cpu-stm8.c
  };
 Index: gdb-12.1/bfd/elf32-stm8.c
 ===================================================================
---- gdb-12.1.orig/bfd/elf32-stm8.c	2023-04-19 09:28:05.681943846 +0200
-+++ gdb-12.1/bfd/elf32-stm8.c	2023-04-19 09:29:00.033705017 +0200
-@@ -222,14 +222,23 @@
+--- gdb-12.1.orig/bfd/elf32-stm8.c	2023-04-19 14:28:19.579625477 +0200
++++ gdb-12.1/bfd/elf32-stm8.c	2023-04-21 18:18:06.272591185 +0200
+@@ -197,7 +197,11 @@
+                asection *input_section ATTRIBUTE_UNUSED,
+                bfd *output_bfd,
+                char **error_message ATTRIBUTE_UNUSED)
+- {
++{
++#if 1
++    fprintf(stderr,"bfd_elf_stm8_spec_reloc:\n");
++#endif
++
+   if (output_bfd != NULL
+       && (symbol->flags & BSF_SECTION_SYM) == 0
+       && (! reloc_entry->howto->partial_inplace
+@@ -216,20 +220,37 @@
+ static reloc_howto_type *
+ elf32_stm8_howto_from_type (unsigned int r_type)
+ {
++#if 1
++    fprintf(stderr,"elf32_stm8_howto_from_type:\n");
++#endif
++
+   if (r_type < ARRAY_SIZE (elf32_stm8_howto_table_1))
+     return &elf32_stm8_howto_table_1[r_type];
+ 
    return NULL;
  }
  
@@ -619,6 +750,10 @@ Index: gdb-12.1/bfd/elf32-stm8.c
  {
    unsigned int r_type;
  
++#if 1
++    fprintf(stderr,"elf32_stm8_info_to_howto:\n");
++#endif
++
    r_type = ELF32_R_TYPE (elf_reloc->r_info);
 -  bfd_reloc->howto = elf32_stm8_howto_from_type (r_type);
 +
@@ -634,7 +769,29 @@ Index: gdb-12.1/bfd/elf32-stm8.c
  }
  
  struct elf32_stm8_reloc_map
-@@ -279,6 +288,7 @@
+@@ -258,6 +279,10 @@
+ {
+   unsigned int i;
+ 
++#if 1
++    fprintf(stderr,"elf32_stm8_reloc_type_lookup:\n");
++#endif
++
+   for (i = 0; i < ARRAY_SIZE (elf32_stm8_reloc_map); i ++)
+     if (elf32_stm8_reloc_map[i].bfd_reloc_val == code)
+       return elf32_stm8_howto_from_type (elf32_stm8_reloc_map[i].elf_reloc_val);
+@@ -271,6 +296,10 @@
+ {
+   unsigned int i;
+ 
++#if 1
++    fprintf(stderr,"elf32_stm8_reloc_name_lookup:\n");
++#endif
++
+   for (i = 0; i < ARRAY_SIZE (elf32_stm8_howto_table_1); i++)
+     if (elf32_stm8_howto_table_1[i].name != NULL
+         && strcasecmp (elf32_stm8_howto_table_1[i].name, r_name) == 0)
+@@ -279,6 +308,7 @@
    return NULL;
  }
  
@@ -642,7 +799,7 @@ Index: gdb-12.1/bfd/elf32-stm8.c
  static void
  elf32_stm8_post_process_headers (bfd *abfd,
                   struct bfd_link_info *info ATTRIBUTE_UNUSED)
-@@ -289,6 +299,7 @@
+@@ -289,12 +319,16 @@
  //  i_ehdrp->e_ident[EI_OSABI] = get_elf_backend_data (abfd)->elf_osabi;
    i_ehdrp->e_ident[EI_ABIVERSION] = 0;
  }
@@ -650,7 +807,16 @@ Index: gdb-12.1/bfd/elf32-stm8.c
  
  static bool
  elf32_stm8_modify_segment_map (bfd *abfd,
-@@ -306,7 +317,7 @@
+             struct bfd_link_info *info ATTRIBUTE_UNUSED)
+ {
+   struct elf_segment_map *m;
++#if 1
++    fprintf(stderr,"elf32_stm8_modify_segment_map:\n");
++#endif
+   return true;
+   m = elf_seg_map (abfd);
+   while (m)
+@@ -306,7 +340,7 @@
    return true;
  }
  
@@ -659,10 +825,21 @@ Index: gdb-12.1/bfd/elf32-stm8.c
  elf32_stm8_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
                  struct bfd_link_info *info,
                  bfd *input_bfd,
+@@ -321,6 +355,10 @@
+   Elf_Internal_Rela *rel;
+   Elf_Internal_Rela *relend;
+ 
++#if 0
++    fprintf(stderr,"elf32_stm8_relocate_section:\n");
++#endif
++
+   symtab_hdr = & elf_tdata (input_bfd)->symtab_hdr;
+   sym_hashes = elf_sym_hashes (input_bfd);
+   relend     = relocs + input_section->reloc_count;
 Index: gdb-12.1/opcodes/stm8-dis.c
 ===================================================================
---- gdb-12.1.orig/opcodes/stm8-dis.c	2023-04-19 09:28:05.783945272 +0200
-+++ gdb-12.1/opcodes/stm8-dis.c	2023-04-19 09:29:00.034705031 +0200
+--- gdb-12.1.orig/opcodes/stm8-dis.c	2023-04-19 14:28:19.682626904 +0200
++++ gdb-12.1/opcodes/stm8-dis.c	2023-04-19 14:29:45.531814718 +0200
 @@ -37,7 +37,7 @@
  int stm8_dis(bfd_vma addr, unsigned int op);
  int stm8_operands(char *s, unsigned char buf[], stm8_addr_mode_t arg);
@@ -690,7 +867,7 @@ Index: gdb-12.1/opcodes/stm8-dis.c
 Index: gdb-12.1/gdb/features/stm8-core.xml
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-12.1/gdb/features/stm8-core.xml	2023-04-19 10:21:43.927958265 +0200
++++ gdb-12.1/gdb/features/stm8-core.xml	2023-04-19 14:29:45.532814732 +0200
 @@ -0,0 +1,26 @@
 +<?xml version="1.0"?>
 +<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
