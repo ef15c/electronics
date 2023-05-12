@@ -1,7 +1,7 @@
 Index: gdb-13.1.90.20230325/bfd/Makefile.am
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/Makefile.am	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/Makefile.am	2023-05-04 09:40:01.948914494 +0200
++++ gdb-13.1.90.20230325/bfd/Makefile.am	2023-05-11 17:46:52.324761842 +0200
 @@ -175,7 +175,8 @@
  	cpu-xstormy16.lo \
  	cpu-xtensa.lo \
@@ -45,7 +45,7 @@ Index: gdb-13.1.90.20230325/bfd/Makefile.am
 Index: gdb-13.1.90.20230325/bfd/Makefile.in
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/Makefile.in	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/Makefile.in	2023-05-04 09:40:01.948914494 +0200
++++ gdb-13.1.90.20230325/bfd/Makefile.in	2023-05-11 17:46:52.325761855 +0200
 @@ -643,7 +643,8 @@
  	cpu-xstormy16.lo \
  	cpu-xtensa.lo \
@@ -105,7 +105,7 @@ Index: gdb-13.1.90.20230325/bfd/Makefile.in
 Index: gdb-13.1.90.20230325/bfd/archures.c
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/archures.c	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/archures.c	2023-05-04 09:40:01.950914522 +0200
++++ gdb-13.1.90.20230325/bfd/archures.c	2023-05-11 17:46:52.325761855 +0200
 @@ -563,6 +563,8 @@
  .#define bfd_mach_amdgcn_gfx1030 0x036
  .#define bfd_mach_amdgcn_gfx1031 0x037
@@ -134,7 +134,7 @@ Index: gdb-13.1.90.20230325/bfd/archures.c
 Index: gdb-13.1.90.20230325/bfd/bfd-in2.h
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/bfd-in2.h	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/bfd-in2.h	2023-05-04 09:40:01.951914536 +0200
++++ gdb-13.1.90.20230325/bfd/bfd-in2.h	2023-05-11 17:46:52.327761881 +0200
 @@ -1865,6 +1865,8 @@
  #define bfd_mach_amdgcn_gfx1030 0x036
  #define bfd_mach_amdgcn_gfx1031 0x037
@@ -167,7 +167,7 @@ Index: gdb-13.1.90.20230325/bfd/bfd-in2.h
 Index: gdb-13.1.90.20230325/bfd/config.bfd
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/config.bfd	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/config.bfd	2023-05-04 09:40:01.952914550 +0200
++++ gdb-13.1.90.20230325/bfd/config.bfd	2023-05-11 17:46:52.328761894 +0200
 @@ -226,6 +226,7 @@
  xtensa*)	 targ_archs=bfd_xtensa_arch ;;
  z80*|r800|z180|gbz80|ez80*)	 targ_archs=bfd_z80_arch ;;
@@ -191,7 +191,7 @@ Index: gdb-13.1.90.20230325/bfd/config.bfd
 Index: gdb-13.1.90.20230325/bfd/configure
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/configure	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/configure	2023-05-04 09:40:01.957914620 +0200
++++ gdb-13.1.90.20230325/bfd/configure	2023-05-11 17:46:52.332761945 +0200
 @@ -13880,6 +13880,7 @@
      z80_coff_vec)		 tb="$tb coff-z80.lo reloc16.lo $coffgen" ;;
      z80_elf32_vec)		 tb="$tb elf32-z80.lo elf32.lo $elf" ;;
@@ -203,7 +203,7 @@ Index: gdb-13.1.90.20230325/bfd/configure
 Index: gdb-13.1.90.20230325/bfd/configure.ac
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/configure.ac	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/configure.ac	2023-05-04 09:40:01.958914634 +0200
++++ gdb-13.1.90.20230325/bfd/configure.ac	2023-05-11 17:46:52.333761958 +0200
 @@ -670,6 +670,7 @@
      z80_coff_vec)		 tb="$tb coff-z80.lo reloc16.lo $coffgen" ;;
      z80_elf32_vec)		 tb="$tb elf32-z80.lo elf32.lo $elf" ;;
@@ -215,7 +215,7 @@ Index: gdb-13.1.90.20230325/bfd/configure.ac
 Index: gdb-13.1.90.20230325/bfd/cpu-stm8.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/bfd/cpu-stm8.c	2023-05-04 09:40:01.958914634 +0200
++++ gdb-13.1.90.20230325/bfd/cpu-stm8.c	2023-05-11 17:46:52.333761958 +0200
 @@ -0,0 +1,42 @@
 +/* BFD support for the STM8 processor.
 +   Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -262,7 +262,7 @@ Index: gdb-13.1.90.20230325/bfd/cpu-stm8.c
 Index: gdb-13.1.90.20230325/bfd/cpu-stm8.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/bfd/cpu-stm8.h	2023-05-04 09:40:01.958914634 +0200
++++ gdb-13.1.90.20230325/bfd/cpu-stm8.h	2023-05-11 17:46:52.333761958 +0200
 @@ -0,0 +1,6 @@
 +#ifndef __CPU_STM8_H
 +#define __CPU_STM8_H
@@ -273,7 +273,7 @@ Index: gdb-13.1.90.20230325/bfd/cpu-stm8.h
 Index: gdb-13.1.90.20230325/bfd/elf32-stm8.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/bfd/elf32-stm8.c	2023-05-04 09:40:01.959914648 +0200
++++ gdb-13.1.90.20230325/bfd/elf32-stm8.c	2023-05-11 17:46:52.334761971 +0200
 @@ -0,0 +1,494 @@
 +/* STM8-specific support for 32-bit ELF
 +   Copyright (C) 2007-2016 Free Software Foundation, Inc.
@@ -772,7 +772,7 @@ Index: gdb-13.1.90.20230325/bfd/elf32-stm8.c
 Index: gdb-13.1.90.20230325/bfd/elfcode.h
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/elfcode.h	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/elfcode.h	2023-05-04 09:40:01.959914648 +0200
++++ gdb-13.1.90.20230325/bfd/elfcode.h	2023-05-11 17:46:52.335761984 +0200
 @@ -149,7 +149,7 @@
  #if DEBUG & 1
  static void elf_debug_file (Elf_Internal_Ehdr *);
@@ -853,7 +853,7 @@ Index: gdb-13.1.90.20230325/bfd/elfcode.h
 Index: gdb-13.1.90.20230325/bfd/reloc.c
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/reloc.c	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/reloc.c	2023-05-04 09:40:01.961914676 +0200
++++ gdb-13.1.90.20230325/bfd/reloc.c	2023-05-11 17:46:52.336761997 +0200
 @@ -8313,6 +8313,26 @@
  ENUMDOC
    LARCH relocations.
@@ -884,7 +884,7 @@ Index: gdb-13.1.90.20230325/bfd/reloc.c
 Index: gdb-13.1.90.20230325/bfd/targets.c
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/targets.c	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/targets.c	2023-05-04 09:40:01.961914676 +0200
++++ gdb-13.1.90.20230325/bfd/targets.c	2023-05-11 17:46:52.337762010 +0200
 @@ -950,6 +950,7 @@
  extern const bfd_target z80_coff_vec;
  extern const bfd_target z80_elf32_vec;
@@ -904,7 +904,7 @@ Index: gdb-13.1.90.20230325/bfd/targets.c
 Index: gdb-13.1.90.20230325/config.sub
 ===================================================================
 --- gdb-13.1.90.20230325.orig/config.sub	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/config.sub	2023-05-04 09:40:01.961914676 +0200
++++ gdb-13.1.90.20230325/config.sub	2023-05-11 17:46:52.338762023 +0200
 @@ -1281,7 +1281,8 @@
  			| x86 | x86_64 | xc16x | xgate | xps100 \
  			| xstormy16 | xtensa* \
@@ -918,7 +918,7 @@ Index: gdb-13.1.90.20230325/config.sub
 Index: gdb-13.1.90.20230325/gdb/configure.tgt
 ===================================================================
 --- gdb-13.1.90.20230325.orig/gdb/configure.tgt	2023-03-25 03:00:59.000000000 +0100
-+++ gdb-13.1.90.20230325/gdb/configure.tgt	2023-05-04 09:40:01.963914704 +0200
++++ gdb-13.1.90.20230325/gdb/configure.tgt	2023-05-11 17:46:52.338762023 +0200
 @@ -738,6 +738,11 @@
  	# Target: Z80
  	gdb_target_obs="z80-tdep.o"
@@ -934,8 +934,8 @@ Index: gdb-13.1.90.20230325/gdb/configure.tgt
 Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/gdb/stm8-tdep.c	2023-05-04 10:43:16.597088880 +0200
-@@ -0,0 +1,1171 @@
++++ gdb-13.1.90.20230325/gdb/stm8-tdep.c	2023-05-12 11:07:30.259414638 +0200
+@@ -0,0 +1,1015 @@
 +/* Target-dependent code for STM8, for GDB.
 +   Written by Ake Rehnman 2017-02-21,
 +   ake.rehnman (at) gmail dot com
@@ -1026,7 +1026,8 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +enum insn_return_kind {
 +  RETURN_RET,
 +  RETURN_RETF,
-+  RETURN_IRET
++  RETURN_IRET,
++  RETURN_UNKNOWN
 +};
 +
 +static int
@@ -1102,30 +1103,6 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +  tdep->producer = stm8_get_producer();
 +}
 +
-+#if 0
-+static const char *
-+stm8_register_name (struct gdbarch *gdbarch, int regnum)
-+{
-+	if (regnum >= 0 && regnum < STM8_NUM_REGS)
-+		return stm8_register_names[regnum];
-+
-+	if (stm8_get_producer() == SDCC_PRODUCER)
-+	{
-+		switch (regnum)
-+		{
-+			case STM8_XH_REGNUM :
-+				return "xh";
-+			case STM8_XL_REGNUM :
-+				return "xl";
-+			case STM8_YH_REGNUM :
-+				return "yh";
-+			case STM8_YL_REGNUM :
-+				return "yl";
-+		}
-+	}
-+	return NULL;
-+}
-+#else
 +static const char *
 +stm8_pseudo_register_name (struct gdbarch *gdbarch, int regnum)
 +{
@@ -1145,32 +1122,12 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +	}
 +	return NULL;
 +}
-+#endif
 +
-+#if 0
-+static struct type *
-+stm8_register_type (struct gdbarch *gdbarch, int regnum)
-+{
-+	switch (regnum)
-+	{
-+	case STM8_PC_REGNUM:
-+		return builtin_type (gdbarch)->builtin_uint32;
-+	case STM8_SP_REGNUM:
-+		return builtin_type (gdbarch)->builtin_uint16;
-+	case STM8_X_REGNUM:
-+	case STM8_Y_REGNUM:
-+		return builtin_type (gdbarch)->builtin_uint16;
-+	default:
-+		return builtin_type (gdbarch)->builtin_uint8;
-+	}
-+}
-+#else
 +static struct type *
 +stm8_pseudo_register_type (struct gdbarch *gdbarch, int regnum)
 +{
 +	return builtin_type (gdbarch)->builtin_uint8;
 +}
-+#endif
 +
 +static enum register_status
 +stm8_pseudo_register_read (struct gdbarch *gdbarch, struct readable_regcache *regcache,
@@ -1288,9 +1245,6 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +	/* Frame size.  */
 +	int stackadj;
 +
-+	/* Frame register.  */
-+	int fp_regnum;
-+
 +	/* Return instruction */
 +	enum insn_return_kind return_kind;
 +
@@ -1393,88 +1347,37 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +static CORE_ADDR
 +stm8_unwind_pc (struct gdbarch *gdbarch, frame_info_ptr next_frame)
 +{
++	/* All STM8 microcontrollers have address range between 0 (RAM)
++	 * and 0x27FFF (0x8000 + 0x20000 -1)
++	 *
++	 * DWARF assisted unwind fetches 4 bytes for address in the current
++	 * configuration, but the actual data size is 2 or 3 bytes.
++	 *
++	 * if the returned value is greater than 0x27FFF, we can retrieve the
++	 * right value by shfiting the value one byte at a time, until the value
++	 * is less than 0x28000
++	 */
++
 +	CORE_ADDR pc;
-+	CORE_ADDR addr_in_block;
-+	frame_info_ptr next_next;
-+#if 0
-+	int size = 2; /* Size of return address on stack */
-+#endif
++	int nbShifts = 0; /* Size of return address on stack */
 +
 +	pc = default_unwind_pc (gdbarch, next_frame);
 +
-+	if (stm8_debug) {
-+		printf_unfiltered ("stm8_unwind_pc called\n");
++	if (stm8_debug)
++		printf_unfiltered ("stm8_unwind_pc called: default unwind pc: %08lX\n", pc);
 +
-+		if (get_frame_type(next_frame) != SENTINEL_FRAME) {
-+			next_next = get_next_frame_sentinel_okay (next_frame);
-+			gdb_assert (next_next != NULL);
-+			addr_in_block = default_unwind_pc (gdbarch, next_next);
-+
-+			if ((addr_in_block & 0xFFFF0000) != 0) {
-+				/* The address sits on the 2 higher bytes */
-+				addr_in_block >>= 16;
-+			}
-+
-+			while (get_frame_type (next_next) == INLINE_FRAME)
-+			    next_next = get_next_frame_sentinel_okay (next_next);
-+
-+			if ((get_frame_type (next_next) == NORMAL_FRAME
-+			       || get_frame_type (next_next) == TAILCALL_FRAME)
-+			      && (get_frame_type (next_frame) == NORMAL_FRAME
-+			  || get_frame_type (next_frame) == TAILCALL_FRAME
-+			  || get_frame_type (next_frame) == INLINE_FRAME))
-+				addr_in_block--;
-+
-+			if (stm8_debug)
-+				printf_unfiltered ("stm8_unwind_pc: func=%08lX\n", addr_in_block);
-+
-+#if 0
-+			switch (stm8_get_return_insn (addr_in_block)) {
-+			case RETURN_RET:
-+				size = 2;
-+				break;
-+			case RETURN_RETF:
-+				size = 3;
-+				break;
-+			case RETURN_IRET:
-+				size = 3;
-+				break;
-+			}
-+#endif
-+		}
-+	}
-+
-+	if ((pc & 0xFFFF0000) != 0) {
-+		/* The address sits on the 2 higher bytes */
-+		pc >>= 16;
++	while (pc >= 0x8000+0x20000) {
++		/* Address is above the maximum possible address for an STM8 microcontroller */
++		/* Shift it one byte right */
++		pc >>= 8;
++		nbShifts++;
 +	}
 +
 +	if (stm8_debug)
-+		printf_unfiltered ("stm8_unwind_pc: pc=%8.8lx\n", (unsigned long)pc);
++		printf_unfiltered ("stm8_unwind_pc: adjusted unwind pc=%06lX, shifted by %d bytes\n", pc, nbShifts);
++
 +	return pc;
 +}
-+
-+#if 0
-+static void
-+stm8_write_pc (struct regcache *regcache, CORE_ADDR pc)
-+{
-+	if (stm8_debug)
-+		printf_unfiltered ("stm8_write_pc called with pc=%04lX\n", pc);
-+	regcache_cooked_write_unsigned (regcache, STM8_PC_REGNUM, pc);
-+}
-+
-+static CORE_ADDR
-+stm8_unwind_sp (struct gdbarch *gdbarch, struct frame_info *next_frame)
-+{
-+	CORE_ADDR sp;
-+
-+	sp = frame_unwind_register_unsigned (next_frame, STM8_SP_REGNUM);
-+	sp = gdbarch_addr_bits_remove (gdbarch, sp);
-+	if (stm8_debug)
-+		printf_unfiltered ("stm8_unwind_sp called: sp=%8.8lx\n", (unsigned long)sp);
-+	return sp;
-+}
-+#endif
 +
 +/* Allocate and initialize a frame cache.  */
 +
@@ -1503,7 +1406,7 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +	CORE_ADDR func_addr, func_end;
 +
 +	if (stm8_debug)
-+		printf_unfiltered ("stm8_get_return_insn: pc = %ld\n", pc);
++		printf_unfiltered ("stm8_get_return_insn: pc = %lX\n", pc);
 +
 +	if (find_pc_partial_function (pc, &name, &func_addr, &func_end))
 +	{
@@ -1526,7 +1429,7 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +	//defaut to RET
 +	if (stm8_debug)
 +		printf_unfiltered ("WARNING: stm8_get_return_insn: No return instruction found in function %s start_addr = %8.8lx end_addr = %8.8lx\n", name, (unsigned long)func_addr, (unsigned long)func_end);
-+	return RETURN_RET;
++	return RETURN_UNKNOWN;
 +}
 +
 +/* Find the start of this function.  */
@@ -1693,7 +1596,7 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +
 +/* Normal frames.
 +
-+  The STM8 frame is typically:
++  The STM8 frame is typically (really? AFAIK there is no fp unless call stack size is greater than 255 bytes)
 +
 +     args
 +     return lo addr
@@ -1705,14 +1608,14 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 + */
 +
 +static struct stm8_frame_cache *
-+stm8_frame_cache (frame_info_ptr this_frame, void **this_cache)
++stm8_frame_unwind_cache (frame_info_ptr this_frame, void **this_cache)
 +{
 +	if (stm8_debug)
-+		printf_unfiltered ("stm8_frame_cache called (this_frame=%p)\n", 			&this_frame);
++		printf_unfiltered ("stm8_frame_unwind_cache called (this_frame=%p)\n", &this_frame);
 +
 +	struct stm8_frame_cache *cache;
 +	struct gdbarch *gdbarch = get_frame_arch (this_frame);
-+	CORE_ADDR start_pc, current_pc, current_sp;
++	CORE_ADDR current_pc, current_sp;
 +	int retsize;
 +
 +	if (stm8_debug)
@@ -1726,74 +1629,72 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +
 +	cache->saved_regs = trad_frame_alloc_saved_regs (this_frame);
 +
-+	start_pc = get_frame_func (this_frame);
++	cache->pc = get_frame_func (this_frame);
 +	if (stm8_debug)
-+		printf_unfiltered ("stm8_frame_cache: frame func address: %04lX\n", start_pc);
++		printf_unfiltered ("stm8_frame_unwind_cache: frame func address: %04lX\n", cache->pc);
 +
-+	if (start_pc) {
-+		cache->return_kind = stm8_get_return_insn (start_pc);
++	if (cache->pc) {
++		cache->return_kind = stm8_get_return_insn (cache->pc);
 +
 +		current_pc = get_frame_pc (this_frame);
 +
 +		if (stm8_debug)
-+			printf_unfiltered ("stm8_frame_cache: current_pc=%04lX\n", current_pc);
++			printf_unfiltered ("stm8_frame_unwind_cache: current_pc=%04lX\n", current_pc);
 +
 +		gdb_assert((current_pc & 0xFF000000) == 0);
 +
 +		current_sp = get_frame_sp (this_frame);
 +		if (stm8_debug)
-+			printf_unfiltered ("stm8_frame_cache: current_sp=%04lX\n", current_sp);
++			printf_unfiltered ("stm8_frame_unwind_cache: current_sp=%04lX\n", current_sp);
 +
 +
 +		/* Analyze the function prologue.  */
-+		stm8_analyze_prologue (gdbarch, start_pc, current_pc,
++		stm8_analyze_prologue (gdbarch, cache->pc, current_pc,
 +				(struct stm8_frame_cache *) *this_cache);
++
++		cache->base = current_sp;
 +
 +		switch (cache->return_kind)
 +		{
 +		default:
 +		case RETURN_RET:
 +			retsize = 2;
++			cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 1 );
 +			break;
 +		case RETURN_RETF:
 +			retsize = 3;
++			cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 2 );
 +			break;
 +		case RETURN_IRET:
 +			retsize = 9;
++			cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 2 + 6 );
 +			break;
 +		}
 +
-+		cache->base = current_sp;
-+		if (cache->return_kind == RETURN_IRET)
-+			cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 1 + 6 );
-+		else
-+			cache->saved_regs[STM8_PC_REGNUM].set_addr ( cache->base + 1 );
 +		cache->saved_regs[STM8_SP_REGNUM].set_addr( cache->base+retsize );
-+
 +
 +		if (stm8_debug)
 +			{
-+			printf_unfiltered ("stm8_frame_cache: (this_frame=%p) base=%4.4lx curr_pc=%4.4lx curr_sp=%4.4lx framesize=%4.4x stackadj=%4.4x retsize=%d\n",
++			printf_unfiltered ("stm8_frame_unwind_cache: (this_frame=%p) base=%4.4lx curr_pc=%4.4lx curr_sp=%4.4lx framesize=%4.4x stackadj=%4.4x retsize=%d\n",
 +					&this_frame, (unsigned long)cache->base, (unsigned long)current_pc, (unsigned long)current_sp, cache->framesize, cache->stackadj, retsize);
 +
 +			CORE_ADDR frame_pc;
 +			CORE_ADDR frame_sp;
 +			frame_pc = value_as_long(trad_frame_get_prev_register (this_frame, cache->saved_regs, STM8_PC_REGNUM));
-+			printf_unfiltered ("stm8_frame_cache: PC OK\n");
++			printf_unfiltered ("stm8_frame_unwind_cache: PC OK\n");
 +
 +			frame_sp =  value_as_long(trad_frame_get_prev_register (this_frame, cache->saved_regs, STM8_SP_REGNUM));
-+			printf_unfiltered ("stm8_frame_cache: SP OK\n");
++			printf_unfiltered ("stm8_frame_unwind_cache: SP OK\n");
 +
 +			frame_pc = frame_pc >> 16;
-+			printf_unfiltered ("stm8_frame_cache: (this_frame=%p) pc=%8.8lx *pc=%8.8lx\n", &this_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr(), (unsigned long)frame_pc);
-+			printf_unfiltered ("stm8_frame_cache: (this_frame=%p) sp=%8.8lx *sp=%8.8lx\n", &this_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr(), (unsigned long)frame_sp);
++			printf_unfiltered ("stm8_frame_unwind_cache: (this_frame=%p) pc=%8.8lx *pc=%8.8lx\n", &this_frame, (unsigned long)cache->saved_regs[STM8_PC_REGNUM].addr(), (unsigned long)frame_pc);
++			printf_unfiltered ("stm8_frame_unwind_cache: (this_frame=%p) sp=%8.8lx *sp=%8.8lx\n", &this_frame, (unsigned long)cache->saved_regs[STM8_SP_REGNUM].addr(), (unsigned long)frame_sp);
 +		}
 +	}
 +	return (struct stm8_frame_cache *) (*this_cache);
 +}
 +
-+/* Given a GDB frame, determine the address of the calling function's
-+   frame.  This will be used to create a new GDB frame struct.  */
++/* Implement the this_id function for the STM8 unwinder.  */
 +static void
 +stm8_frame_this_id (frame_info_ptr this_frame, void **this_cache,
 +		struct frame_id *this_id)
@@ -1802,21 +1703,15 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +		printf_unfiltered ("stm8_frame_this_id called (this_frame=%p)\n", &this_frame);
 +
 +	struct stm8_frame_cache *cache =
-+			stm8_frame_cache (this_frame, this_cache);
-+	CORE_ADDR func;
-+	CORE_ADDR base;
-+
-+	func = get_frame_func (this_frame);
-+	base = cache->base;
-+
++			stm8_frame_unwind_cache (this_frame, this_cache);
 +	/* This marks the outermost frame.  */
-+	if (base == 0)
++	if (cache->base == 0)
 +		return;
 +
-+	(*this_id) = frame_id_build (base, func);
++	(*this_id) = frame_id_build (cache->base, cache->pc);
 +
 +	if (stm8_debug)
-+		printf_unfiltered ("stm8_frame_this_id: base=%8.8lx pc=%8.8lx\n", (unsigned long)base, (unsigned long)func);
++		printf_unfiltered ("stm8_frame_this_id: base=%8.8lx pc=%8.8lx\n", (unsigned long)cache->base, (unsigned long)cache->pc);
 +}
 +
 +static struct value *
@@ -1827,7 +1722,7 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +		printf_unfiltered ("stm8_frame_prev_register called (this_frame=%p)\n", &this_frame);
 +
 +	struct value *value;
-+	struct stm8_frame_cache *info = stm8_frame_cache (this_frame,
++	struct stm8_frame_cache *info = stm8_frame_unwind_cache (this_frame,
 +			this_cache);
 +
 +	value = trad_frame_get_prev_register (this_frame, info->saved_regs, regnum);
@@ -1971,10 +1866,6 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +  stm8_initialize_soft_register_info(tdep);
 +
 +  set_gdbarch_num_regs (gdbarch, STM8_NUM_REGS);
-+  #if 0
-+  set_gdbarch_register_name (gdbarch, stm8_register_name);
-+  set_gdbarch_register_type (gdbarch, stm8_register_type);
-+  #endif
 +  set_tdesc_pseudo_register_type (gdbarch, stm8_pseudo_register_type);
 +  set_tdesc_pseudo_register_name (gdbarch, stm8_pseudo_register_name);
 +
@@ -2011,30 +1902,13 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +
 +  set_gdbarch_breakpoint_from_pc (gdbarch, stm8_breakpoint_from_pc);
 +
-+  //set_gdbarch_frame_args_skip (gdbarch, 8);
-+
-+  //set_gdbarch_print_insn (gdbarch, print_insn_stm8);
-+
 +  set_gdbarch_unwind_pc (gdbarch, stm8_unwind_pc);
-+#if 0
-+  set_gdbarch_write_pc (gdbarch, stm8_write_pc);
-+  set_gdbarch_unwind_sp (gdbarch, stm8_unwind_sp);
-+#endif
-+  ////set_gdbarch_dummy_id (gdbarch, stm8_dummy_id);
 +
-+  ////frame_base_set_default (gdbarch, &stm8_frame_base);
-+
-+  /* Hook in ABI-specific overrides, if they have been registered.  */
-+  //gdbarch_init_osabi (info, gdbarch);
-+
-+  //dwarf2 cfi unwinder
-+  //dwarf2_frame_set_init_reg (gdbarch, stm8_dwarf2_frame_init_reg);
 +  set_gdbarch_dwarf2_addr_size (gdbarch, 4);
 +
 +  dwarf2_append_unwinders (gdbarch);
 +  frame_unwind_append_unwinder (gdbarch, &stm8_frame_unwind);
 +  frame_base_append_sniffer (gdbarch, dwarf2_frame_base_sniffer);
-+  ////frame_base_append_sniffer (gdbarch, stm8_frame_base_sniffer);
 +
 +//  /* Create a type for PC.  We can't use builtin types here, as they may not
 +//     be defined.  */
@@ -2045,36 +1919,6 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 +  				     2*TARGET_CHAR_BIT,
 +				     NULL, tdep->func_void_type);
 +  tdep->pc_type->set_is_unsigned (true);
-+
-+//  set_gdbarch_short_bit (gdbarch, 2 * TARGET_CHAR_BIT);
-+//  set_gdbarch_int_bit (gdbarch, 2 * TARGET_CHAR_BIT);
-+//  set_gdbarch_long_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-+//  set_gdbarch_long_long_bit (gdbarch, 8 * TARGET_CHAR_BIT);
-+//  set_gdbarch_ptr_bit (gdbarch, 2 * TARGET_CHAR_BIT);
-+//  set_gdbarch_addr_bit (gdbarch, 32);
-+//
-+//  set_gdbarch_float_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-+//  set_gdbarch_double_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-+//  set_gdbarch_long_double_bit (gdbarch, 4 * TARGET_CHAR_BIT);
-+//
-+//  set_gdbarch_float_format (gdbarch, floatformats_ieee_single);
-+//  set_gdbarch_double_format (gdbarch, floatformats_ieee_single);
-+//  set_gdbarch_long_double_format (gdbarch, floatformats_ieee_single);
-+//
-+//
-+//  set_gdbarch_push_dummy_call (gdbarch, stm8_push_dummy_call);
-+//
-+//  set_gdbarch_dwarf2_reg_to_regnum (gdbarch, stm8_dwarf_reg_to_regnum);
-+//
-+//  set_gdbarch_address_to_pointer (gdbarch, stm8_address_to_pointer);
-+//  set_gdbarch_pointer_to_address (gdbarch, stm8_pointer_to_address);
-+//  set_gdbarch_integer_to_address (gdbarch, stm8_integer_to_address);
-+//
-+//  frame_base_set_default (gdbarch, &stm8_frame_base);
-+//
-+//  set_gdbarch_dummy_id (gdbarch, stm8_dummy_id);
-+//
-+//
 +
 +  if (tdesc_data != NULL)
 +    tdesc_use_registers (gdbarch, tdesc, std::move (tdesc_data));
@@ -2110,7 +1954,7 @@ Index: gdb-13.1.90.20230325/gdb/stm8-tdep.c
 Index: gdb-13.1.90.20230325/include/dis-asm.h
 ===================================================================
 --- gdb-13.1.90.20230325.orig/include/dis-asm.h	2023-03-25 03:01:00.000000000 +0100
-+++ gdb-13.1.90.20230325/include/dis-asm.h	2023-05-04 09:40:01.963914704 +0200
++++ gdb-13.1.90.20230325/include/dis-asm.h	2023-05-11 17:46:52.339762036 +0200
 @@ -373,6 +373,7 @@
  extern int print_insn_rl78_g10		(bfd_vma, disassemble_info *);
  extern int print_insn_rl78_g13		(bfd_vma, disassemble_info *);
@@ -2122,7 +1966,7 @@ Index: gdb-13.1.90.20230325/include/dis-asm.h
 Index: gdb-13.1.90.20230325/include/elf/stm8.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/include/elf/stm8.h	2023-05-04 09:40:01.963914704 +0200
++++ gdb-13.1.90.20230325/include/elf/stm8.h	2023-05-11 17:46:52.340762049 +0200
 @@ -0,0 +1,41 @@
 +/* STM8 ELF support for BFD.
 +   Written by Ake Rehnman 2017-02-21,
@@ -2168,7 +2012,7 @@ Index: gdb-13.1.90.20230325/include/elf/stm8.h
 Index: gdb-13.1.90.20230325/include/opcode/stm8.h
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/include/opcode/stm8.h	2023-05-04 09:40:01.965914732 +0200
++++ gdb-13.1.90.20230325/include/opcode/stm8.h	2023-05-11 17:46:52.340762049 +0200
 @@ -0,0 +1,84 @@
 +/* include/opcode/stm8.h -- Assembler for the STM8.
 +   Written by Ake Rehnman 2017-02-21,
@@ -2257,7 +2101,7 @@ Index: gdb-13.1.90.20230325/include/opcode/stm8.h
 Index: gdb-13.1.90.20230325/opcodes/Makefile.am
 ===================================================================
 --- gdb-13.1.90.20230325.orig/opcodes/Makefile.am	2023-03-25 03:01:01.000000000 +0100
-+++ gdb-13.1.90.20230325/opcodes/Makefile.am	2023-05-04 09:40:01.965914732 +0200
++++ gdb-13.1.90.20230325/opcodes/Makefile.am	2023-05-11 17:46:52.340762049 +0200
 @@ -267,7 +267,9 @@
  	xgate-dis.c \
  	xgate-opc.c \
@@ -2272,7 +2116,7 @@ Index: gdb-13.1.90.20230325/opcodes/Makefile.am
 Index: gdb-13.1.90.20230325/opcodes/Makefile.in
 ===================================================================
 --- gdb-13.1.90.20230325.orig/opcodes/Makefile.in	2023-03-25 03:01:01.000000000 +0100
-+++ gdb-13.1.90.20230325/opcodes/Makefile.in	2023-05-04 09:40:01.966914746 +0200
++++ gdb-13.1.90.20230325/opcodes/Makefile.in	2023-05-11 17:46:52.341762062 +0200
 @@ -659,7 +659,9 @@
  	xgate-dis.c \
  	xgate-opc.c \
@@ -2296,7 +2140,7 @@ Index: gdb-13.1.90.20230325/opcodes/Makefile.in
 Index: gdb-13.1.90.20230325/opcodes/configure
 ===================================================================
 --- gdb-13.1.90.20230325.orig/opcodes/configure	2023-03-25 03:01:01.000000000 +0100
-+++ gdb-13.1.90.20230325/opcodes/configure	2023-05-04 09:40:01.969914788 +0200
++++ gdb-13.1.90.20230325/opcodes/configure	2023-05-11 17:46:52.345762114 +0200
 @@ -12599,6 +12599,7 @@
  	bfd_z8k_arch)		ta="$ta z8k-dis.lo" ;;
  	bfd_bpf_arch)		ta="$ta bpf-asm.lo bpf-desc.lo bpf-dis.lo bpf-ibld.lo bpf-opc.lo" using_cgen=yes ;;
@@ -2308,7 +2152,7 @@ Index: gdb-13.1.90.20230325/opcodes/configure
 Index: gdb-13.1.90.20230325/opcodes/configure.ac
 ===================================================================
 --- gdb-13.1.90.20230325.orig/opcodes/configure.ac	2023-03-25 03:01:01.000000000 +0100
-+++ gdb-13.1.90.20230325/opcodes/configure.ac	2023-05-04 09:40:01.969914788 +0200
++++ gdb-13.1.90.20230325/opcodes/configure.ac	2023-05-11 17:46:52.345762114 +0200
 @@ -347,6 +347,7 @@
  	bfd_z8k_arch)		ta="$ta z8k-dis.lo" ;;
  	bfd_bpf_arch)		ta="$ta bpf-asm.lo bpf-desc.lo bpf-dis.lo bpf-ibld.lo bpf-opc.lo" using_cgen=yes ;;
@@ -2320,7 +2164,7 @@ Index: gdb-13.1.90.20230325/opcodes/configure.ac
 Index: gdb-13.1.90.20230325/opcodes/disassemble.c
 ===================================================================
 --- gdb-13.1.90.20230325.orig/opcodes/disassemble.c	2023-03-25 03:01:01.000000000 +0100
-+++ gdb-13.1.90.20230325/opcodes/disassemble.c	2023-05-04 09:40:01.969914788 +0200
++++ gdb-13.1.90.20230325/opcodes/disassemble.c	2023-05-11 17:46:52.345762114 +0200
 @@ -102,6 +102,7 @@
  #define ARCH_xtensa
  #define ARCH_z80
@@ -2344,7 +2188,7 @@ Index: gdb-13.1.90.20230325/opcodes/disassemble.c
 Index: gdb-13.1.90.20230325/opcodes/stm8-dis.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/opcodes/stm8-dis.c	2023-05-04 09:40:01.970914802 +0200
++++ gdb-13.1.90.20230325/opcodes/stm8-dis.c	2023-05-11 17:46:52.346762127 +0200
 @@ -0,0 +1,448 @@
 +/* Disassemble STM8 instructions.
 +   Copyright (C) 1999-2018 Free Software Foundation, Inc.
@@ -2797,7 +2641,7 @@ Index: gdb-13.1.90.20230325/opcodes/stm8-dis.c
 Index: gdb-13.1.90.20230325/opcodes/stm8-opc.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/opcodes/stm8-opc.c	2023-05-04 09:40:01.970914802 +0200
++++ gdb-13.1.90.20230325/opcodes/stm8-opc.c	2023-05-11 17:46:52.347762140 +0200
 @@ -0,0 +1,813 @@
 +/* stm8-opc.c -- Table of opcodes for the STM8 processor.
 +   Copyright (C) 2007-2018 Free Software Foundation, Inc.
@@ -3615,7 +3459,7 @@ Index: gdb-13.1.90.20230325/opcodes/stm8-opc.c
 Index: gdb-13.1.90.20230325/bfd/libbfd.h
 ===================================================================
 --- gdb-13.1.90.20230325.orig/bfd/libbfd.h	2023-03-25 03:00:57.000000000 +0100
-+++ gdb-13.1.90.20230325/bfd/libbfd.h	2023-05-04 09:40:01.971914816 +0200
++++ gdb-13.1.90.20230325/bfd/libbfd.h	2023-05-11 17:46:52.347762140 +0200
 @@ -3477,6 +3477,10 @@
    "BFD_RELOC_LARCH_SUB24",
    "BFD_RELOC_LARCH_SUB32",
@@ -3630,7 +3474,7 @@ Index: gdb-13.1.90.20230325/bfd/libbfd.h
 Index: gdb-13.1.90.20230325/gdb/infcmd.c
 ===================================================================
 --- gdb-13.1.90.20230325.orig/gdb/infcmd.c	2023-03-25 03:00:59.000000000 +0100
-+++ gdb-13.1.90.20230325/gdb/infcmd.c	2023-05-04 09:40:01.972914830 +0200
++++ gdb-13.1.90.20230325/gdb/infcmd.c	2023-05-11 17:46:52.348762153 +0200
 @@ -512,6 +512,7 @@
  
    /* Start the target running.  Do not use -1 continuation as it would skip
@@ -3642,7 +3486,7 @@ Index: gdb-13.1.90.20230325/gdb/infcmd.c
 Index: gdb-13.1.90.20230325/gdb/Makefile.in
 ===================================================================
 --- gdb-13.1.90.20230325.orig/gdb/Makefile.in	2023-03-25 03:00:59.000000000 +0100
-+++ gdb-13.1.90.20230325/gdb/Makefile.in	2023-05-04 09:40:01.973914844 +0200
++++ gdb-13.1.90.20230325/gdb/Makefile.in	2023-05-11 17:46:52.349762166 +0200
 @@ -863,6 +863,7 @@
  	sparc-ravenscar-thread.o \
  	sparc-sol2-tdep.o \
@@ -3654,7 +3498,7 @@ Index: gdb-13.1.90.20230325/gdb/Makefile.in
 Index: gdb-13.1.90.20230325/gdb/features/Makefile
 ===================================================================
 --- gdb-13.1.90.20230325.orig/gdb/features/Makefile	2023-03-25 03:00:59.000000000 +0100
-+++ gdb-13.1.90.20230325/gdb/features/Makefile	2023-05-04 09:40:01.973914844 +0200
++++ gdb-13.1.90.20230325/gdb/features/Makefile	2023-05-11 17:46:52.349762166 +0200
 @@ -168,7 +168,8 @@
  	s390x-gs-linux64.xml \
  	sparc/sparc32-solaris.xml \
@@ -3668,7 +3512,7 @@ Index: gdb-13.1.90.20230325/gdb/features/Makefile
 Index: gdb-13.1.90.20230325/gdb/features/stm8-core.xml
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/gdb/features/stm8-core.xml	2023-05-04 09:40:01.974914858 +0200
++++ gdb-13.1.90.20230325/gdb/features/stm8-core.xml	2023-05-11 17:46:52.350762179 +0200
 @@ -0,0 +1,26 @@
 +<?xml version="1.0"?>
 +<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
@@ -3699,7 +3543,7 @@ Index: gdb-13.1.90.20230325/gdb/features/stm8-core.xml
 Index: gdb-13.1.90.20230325/gdb/features/stm8.c
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/gdb/features/stm8.c	2023-05-04 09:40:01.974914858 +0200
++++ gdb-13.1.90.20230325/gdb/features/stm8.c	2023-05-11 17:46:52.350762179 +0200
 @@ -0,0 +1,36 @@
 +/* THIS FILE IS GENERATED.  -*- buffer-read-only: t -*- vi:set ro:
 +  Original: stm8.xml */
@@ -3740,7 +3584,7 @@ Index: gdb-13.1.90.20230325/gdb/features/stm8.c
 Index: gdb-13.1.90.20230325/gdb/features/stm8.xml
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ gdb-13.1.90.20230325/gdb/features/stm8.xml	2023-05-04 09:40:01.974914858 +0200
++++ gdb-13.1.90.20230325/gdb/features/stm8.xml	2023-05-11 17:46:52.350762179 +0200
 @@ -0,0 +1,12 @@
 +<?xml version="1.0"?>
 +<!-- Copyright (C) 2020-2022 Free Software Foundation, Inc.
