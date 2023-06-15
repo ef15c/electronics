@@ -110,7 +110,7 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-8.3.1-verbose-build.patch
-#	"${FILESDIR}"/${PN}-13.2-add-stm8-target.patch
+	"${FILESDIR}"/${PN}-13.2-add-stm8-target.patch
 )
 
 pkg_setup() {
