@@ -42,8 +42,8 @@ src_install() {
 	emake INSTALL_ROOT="${D}" install
 	mkdir -p ${D}/usr/share/applications
 	cp resources/linux/cemu.desktop ${D}/usr/share/applications
-	mkdir -p ${D}/usr/share/mime/application
-	cp resources/linux/cemu.xml ${D}/usr/share/mime/application
+	mkdir -p ${D}/usr/share/mime/packages
+	cp resources/linux/cemu.xml ${D}/usr/share/mime/packages
 	for length in 512 256 192 160 128 96 72 64 48 42 40 36 32 24 22 20 16; do \
 		mkdir -p ${D}/usr/share/icons/hicolor/${length}x${length}/apps ;
 		cp resources/icons/linux/cemu-${length}x${length}.png ${D}/usr/share/icons/hicolor/${length}x${length}/apps/cemu.png ;
