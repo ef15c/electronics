@@ -16,7 +16,9 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="media-libs/libpng[apng] \
-dev-qt/qtcore:5"
+dev-qt/qtcore:5 \
+dev-qt/qtnetwork:5"
+
 RDEPEND="${DEPEND}"
 BDEPEND="dev-vcs/git"
 
