@@ -1,0 +1,133 @@
+Index: CEmu-1.3/tests/autotester/autotester.h
+===================================================================
+--- CEmu-1.3.orig/tests/autotester/autotester.h
++++ CEmu-1.3/tests/autotester/autotester.h
+@@ -8,7 +8,7 @@
+ #ifndef AUTOTESTER_H
+ #define AUTOTESTER_H
+ 
+-#include <string>
++#include <cstring>
+ #include <vector>
+ #include <unordered_map>
+ 
+Index: CEmu-1.3/gui/qt/tivarslib/BinaryFile.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/BinaryFile.cpp
++++ CEmu-1.3/gui/qt/tivarslib/BinaryFile.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "BinaryFile.h"
+ #include "tivarslib_utils.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TIModel.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TIModel.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TIModel.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TIModel.h"
+ #include "TIModels.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TIVarType.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TIVarType.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TIVarType.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TIVarType.h"
+ #include "TIVarTypes.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/DummyHandler.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/DummyHandler.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/DummyHandler.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "../CommonTypes.h"
+ #include "TypeHandlers.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericList.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/TH_GenericList.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericList.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include "../tivarslib_utils.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericAppVar.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/TH_GenericAppVar.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericAppVar.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include "../tivarslib_utils.h"
++#include <stdexcept>
+ 
+ #include <cstring>
+ 
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericReal.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/TH_GenericReal.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_GenericReal.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include "../tivarslib_utils.h"
++#include <stdexcept>
+ 
+ #include <unordered_map>
+ 
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_Matrix.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/TH_Matrix.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_Matrix.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include "../tivarslib_utils.h"
++#include <stdexcept>
+ 
+ namespace tivars
+ {
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/STH_PythonAppVar.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/STH_PythonAppVar.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/STH_PythonAppVar.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include "../tivarslib_utils.h"
++#include <stdexcept>
+ 
+ #include <cstring>
+ 
+Index: CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_TempEqu.cpp
+===================================================================
+--- CEmu-1.3.orig/gui/qt/tivarslib/TypeHandlers/TH_TempEqu.cpp
++++ CEmu-1.3/gui/qt/tivarslib/TypeHandlers/TH_TempEqu.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "TypeHandlers.h"
+ #include <cstring>
++#include <stdexcept>
+ 
+ namespace tivars
+ {
