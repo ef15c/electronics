@@ -13,7 +13,7 @@ LICENSE="GPL-3 \
 MIT"
 
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~arm"
 
 DEPEND="media-libs/libpng[apng] \
 dev-qt/qtcore:5 \
