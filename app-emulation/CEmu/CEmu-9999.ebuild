@@ -17,7 +17,8 @@ KEYWORDS="~amd64 ~arm"
 
 DEPEND="media-libs/libpng[apng] \
 dev-qt/qtcore:5 \
-dev-qt/qtnetwork:5"
+dev-qt/qtnetwork:5 \
+dev-qt/qtwidgets:5"
 
 RDEPEND="${DEPEND}"
 BDEPEND="dev-vcs/git"
