@@ -1,0 +1,20 @@
+Index: OpenHantek6022-3.3.2.2/cmake/CPackInfos.cmake
+===================================================================
+--- OpenHantek6022-3.3.2.2.orig/cmake/CPackInfos.cmake
++++ OpenHantek6022-3.3.2.2/cmake/CPackInfos.cmake
+@@ -24,14 +24,7 @@ if (UNIX)
+     set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+     set(CPACK_GENERATOR TGZ)
+ 
+-    if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+-        set(CPACK_TARGET "")
+-        set(CPACK_GENERATOR ${CPACK_GENERATOR} DEB RPM)
+-        install(
+-            FILES utils/udev_rules/60-openhantek.rules
+-            DESTINATION lib/udev/rules.d
+-        )
+-    elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
++    if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+         set(CPACK_TARGET "freebsd_")
+         set(CPACK_PACKAGING_INSTALL_PREFIX "/usr/local")
+         install(
