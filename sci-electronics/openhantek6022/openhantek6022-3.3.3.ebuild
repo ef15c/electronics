@@ -25,7 +25,7 @@ DEPEND=">=dev-qt/qtprintsupport-5.4
 "
 RDEPEND="${DEPEND}
 	sci-electronics/electronics-menu"
-BDEPEND=">=dev-util/cmake-3.5"
+BDEPEND=">=dev-build/cmake-3.5"
 
 PATCHES=(
 	"${FILESDIR}"/${P}-change-cmake-install-prefix.patch
