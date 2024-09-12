@@ -25,7 +25,7 @@ PATCHES=(
 
 src_prepare() {
 	autoreconf
-	eapply_user
+	default
 }
 
 src_install() {
