@@ -12,9 +12,13 @@ LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~amd64"
 
-DEPEND=""
+DEPEND="dev-lang/ocaml \
+gui-libs/gtksourceview"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
 S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
 
+src_prepare() {
+	autoreconf
+}
