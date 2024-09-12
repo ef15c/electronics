@@ -27,7 +27,3 @@ src_prepare() {
 	autoreconf
 	default
 }
-
-src_install() {
-	make install
-}
