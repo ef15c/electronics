@@ -24,6 +24,10 @@ src_prepare() {
 	eapply_user
 }
 
+src_configure() {
+	./configure --prefix=${D}/usr
+}
+
 src_install() {
-	emake DESTDIR="${D}" install
+	make  install
 }
