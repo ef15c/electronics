@@ -13,7 +13,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="dev-lang/ocaml \
-x11/gtksourceview:3.0"
+x11-libs/gtksourceview:3.0"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
