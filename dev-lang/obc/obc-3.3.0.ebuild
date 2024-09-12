@@ -19,6 +19,8 @@ BDEPEND=""
 
 S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
 
+RESTRICT="strip"
+
 PATCHES=(
 	"$FILESDIR/${P}-0000-fix-install-path.patch"
 )
