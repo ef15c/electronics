@@ -15,3 +15,6 @@ KEYWORDS="~amd64"
 DEPEND=""
 RDEPEND="${DEPEND}"
 BDEPEND=""
+
+S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
+
