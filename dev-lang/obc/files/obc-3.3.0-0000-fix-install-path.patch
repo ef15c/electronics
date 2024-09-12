@@ -1,0 +1,26 @@
+Index: obc-3-rel-3.3.0/Makefile.in
+===================================================================
+--- obc-3-rel-3.3.0.orig/Makefile.in	2022-01-21 23:01:09.000000000 +0100
++++ obc-3-rel-3.3.0/Makefile.in	2024-09-12 14:40:49.853243931 +0200
+@@ -292,14 +292,14 @@
+ 
+ # Install after building
+ install:: force
+-	for d in $(DIRS); do $(INSTALL) -d $$d; done
+-	for f in $(BIN); do $(INSTALL_PROG) $$f $(bindir); done
+-	for f in $(LIBSRC); do $(INSTALL_DATA) $$f $(libdir)/obc; done
+-	for f in $(LIB); do $(INSTALL_DATA) $$f $(libdir)/obc; done
+-	for f in $(LIBX); do $(INSTALL_PROG) $$f $(libdir)/obc; done
+-	for f in $(RES); do $(INSTALL_DATA) $$f $(libdir)/obc/resources; done
++	for d in $(DIRS); do $(INSTALL) -d $(DESTDIR)/$$d; done
++	for f in $(BIN); do $(INSTALL_PROG) $$f $(DESTDIR)/$(bindir); done
++	for f in $(LIBSRC); do $(INSTALL_DATA) $$f $(DESTDIR)/$(libdir)/obc; done
++	for f in $(LIB); do $(INSTALL_DATA) $$f $(DESTDIR)/$(libdir)/obc; done
++	for f in $(LIBX); do $(INSTALL_PROG) $$f $(DESTDIR)/$(libdir)/obc; done
++	for f in $(RES); do $(INSTALL_DATA) $$f $(DESTDIR)/$(libdir)/obc/resources; done
+ 	for f in $(MAN); do \
+-		$(INSTALL_DATA) $(top_srcdir)/man/$$f $(mandir)/man1; done
++		$(INSTALL_DATA) $(top_srcdir)/man/$$f $(DESTDIR)/$(mandir)/man1; done
+ 
+ ifdef ENABLE_DEBUGGER
+   ifdef MACOS

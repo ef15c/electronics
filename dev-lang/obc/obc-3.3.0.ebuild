@@ -19,15 +19,15 @@ BDEPEND=""
 
 S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
 
+PATCHES=(
+	"$FILESDIR/${P}-0000-fix-install-path.patch"
+)
+
 src_prepare() {
 	autoreconf
 	eapply_user
 }
 
-src_configure() {
-	./configure --prefix=${D}/usr
-}
-
 src_install() {
-	make  install
+	make install
 }
