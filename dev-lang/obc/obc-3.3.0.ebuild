@@ -13,7 +13,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="dev-lang/ocaml \
-gui-libs/gtksourceview"
+x11/gtksourceview:3.0"
 RDEPEND="${DEPEND}"
 BDEPEND=""
 
@@ -22,4 +22,8 @@ S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
 src_prepare() {
 	autoreconf
 	eapply_user
+}
+
+src_install() {
+	emake DESTDIR="${D}" install
 }
