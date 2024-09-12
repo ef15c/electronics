@@ -21,4 +21,5 @@ S=${WORKDIR}/${PN}-${PMV}-rel-${PV}
 
 src_prepare() {
 	autoreconf
+	eapply_user
 }
