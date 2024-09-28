@@ -124,7 +124,6 @@ src_prepare() {
 	# Ensure that internal copies of expat and libffi are not used.
 	# TODO: Makefile has annoying deps on expat headers
 	#rm -r Modules/expat || die
-	rm -r Modules/_ctypes/libffi* || die
 
 	local PATCHES=(
 		"${WORKDIR}/${PATCHSET}"
@@ -150,7 +149,7 @@ build_cbuild_python() {
 	# propagated to sysconfig for built extensions
 	#
 	# -fno-lto to avoid bug #700012 (not like it matters for mini-CBUILD Python anyway)
-	local -x CFLAGS_NODIST="${BUILD_CFLAGS} -fno-lto"
+	local -x CFLAGS_NODIST="${BUILD_CFLAGS} -I"${ESYSROOT}"/usr/lib/libffi/include -fno-lto"
 	local -x LDFLAGS_NODIST=${BUILD_LDFLAGS}
 	local -x CFLAGS= LDFLAGS=
 	local -x BUILD_CFLAGS="${CFLAGS_NODIST}"
@@ -331,6 +330,10 @@ src_configure() {
 
 	# disable implicit optimization/debugging flags
 	local -x OPT=
+
+#	if use ssl; then
+#		append-cppflags -I"${ESYSROOT}"/usr/lib/libffi/include
+#	fi
 
 	if tc-is-cross-compiler ; then
 		build_cbuild_python
