@@ -1,0 +1,14 @@
+Index: Net-SSLeay-1.94/Makefile.PL
+===================================================================
+--- Net-SSLeay-1.94.orig/Makefile.PL	2024-09-28 10:13:21.785517075 +0200
++++ Net-SSLeay-1.94/Makefile.PL	2024-09-28 10:27:54.028572857 +0200
+@@ -132,6 +132,9 @@
+     add_ccflag( $eumm_args{CCFLAGS}, '-DNET_SSLEAY_32BIT_INT_PERL' );
+ }
+ 
++# Fix LDDFLAGS for cross compilation
++$eumm_args{LDDLFLAGS} = "-shared " . $ENV{LDFLAGS};
++
+ # This can go when EU::MM older than 6.58 are gone
+ $eumm_args{AUTHOR} = join(', ', @{$eumm_args{AUTHOR}}) unless eval { ExtUtils::MakeMaker->VERSION(6.58); };
+ 

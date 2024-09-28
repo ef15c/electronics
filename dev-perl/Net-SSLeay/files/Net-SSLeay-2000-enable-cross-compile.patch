@@ -1,0 +1,13 @@
+Index: Net-SSLeay-1.94/Makefile.PL
+===================================================================
+--- Net-SSLeay-1.94.orig/Makefile.PL	2024-09-27 16:45:54.896375625 +0200
++++ Net-SSLeay-1.94/Makefile.PL	2024-09-28 09:27:04.725109729 +0200
+@@ -109,7 +109,7 @@
+ 
+ # CCFLAGS is used internally by Makefile.PL to define various C preprocessor
+ # macros (as opposed to DEFINE, which is user-facing).
+-$eumm_args{CCFLAGS} = $Config{ccflags};
++$eumm_args{CCFLAGS} = "";
+ 
+ # Expose the current Perl version to the C preprocessor. This is used in
+ # SSLeay.xs before perl.h is included (and therefore before its PERL_VERSION_*
