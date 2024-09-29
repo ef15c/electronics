@@ -1,0 +1,72 @@
+Index: rasqal-0.9.33/configure.ac
+===================================================================
+--- rasqal-0.9.33.orig/configure.ac	2024-09-29 11:30:03.832196079 +0200
++++ rasqal-0.9.33/configure.ac	2024-09-29 11:31:21.633480989 +0200
+@@ -455,28 +455,19 @@
+ 	[enable_pcre=$enableval], [enable_pcre="auto"])
+ 
+ if test "x$enable_pcre" != "xno" ; then
+-
+-  AC_ARG_WITH(pcre-config, [  --with-pcre-config=PATH     Location of PCRE pcre-config (auto)], pcre_config="$withval", pcre_config="")
+-
+-  if test "X$pcre_config" != "Xno" ; then
+-    if test "X$pcre_config" != "X" ; then
+-      AC_MSG_CHECKING(for $pcre_config)
+-
+-      if test -x $pcre_config ; then
+-	PCRE_CONFIG=$pcre_config
+-	AC_MSG_RESULT(yes)
+-      else
+-	AC_MSG_ERROR([pcre-config not found at specified path $pcre_config])
+-      fi
+-    fi
+-    if test "X$PCRE_CONFIG" = "X" ; then
+-      AC_CHECK_PROGS(PCRE_CONFIG, pcre-config)
+-    fi
+-  fi
+-
+-  AC_MSG_CHECKING(for pcre)
+-  PCRE_VERSION=`$PCRE_CONFIG --version 2>/dev/null`
+   PCRE_MIN_VERSION=3.9
++  PKG_CHECK_MODULES([PCRE],[libpcre],[
++    PCRE_VERSION=`$PKG_CONFIG --modversion libpcre 2>/dev/null`
++    pcre_too_old=0
++    AS_VERSION_COMPARE([$PCRE_VERSION], $PCRE_MIN_VERSION, pcre_too_old="1")
++    if test $pcre_too_old = 1; then
++      AC_MSG_WARN($PCRE_VERSION - too old - need $PCRE_MIN_VERSION)
++    fi
++  ],[
++    AC_MSG_ERROR(PCRE requested but not found)
++  ])
++  AC_SUBST(PCRE_CFLAGS)
++  AC_SUBST(CRE_LIBS)
+ 
+   PCRE_VERSION_DEC=`echo $PCRE_VERSION | $AWK -F. '{printf("%d\n", 100*$1 + $2)};'`
+   PCRE_MIN_VERSION_DEC=`echo $PCRE_MIN_VERSION | $AWK -F. '{printf("%d\n", 100*$1 + $2)};'`
+@@ -485,8 +476,6 @@
+   elif test "X$PCRE_VERSION" -a $PCRE_VERSION_DEC -ge $PCRE_MIN_VERSION_DEC; then
+     have_regex_pcre=1
+     AC_MSG_RESULT($PCRE_VERSION)
+-  else
+-    AC_MSG_WARN($PCRE_VERSION - too old - need $PCRE_MIN_VERSION)
+   fi
+ 
+   if test $have_regex_pcre = 1; then
+@@ -914,13 +903,11 @@
+ 
+ 
+ if test $need_regex_pcre = 1; then
+-  C=`$PCRE_CONFIG --cflags`
+-  L=`$PCRE_CONFIG --libs`
+-  RASQAL_INTERNAL_CPPFLAGS="$RASQAL_INTERNAL_CPPFLAGS $C"
+-  RASQAL_EXTERNAL_LIBS="$RASQAL_EXTERNAL_LIBS $L"
++  RASQAL_INTERNAL_CPPFLAGS="$RASQAL_INTERNAL_CPPFLAGS $PCRE_CFLAGS"
++  RASQAL_EXTERNAL_LIBS="$RASQAL_EXTERNAL_LIBS $PCRE_LIBS"
+ 
+-  PKGCONFIG_CFLAGS="$PKGCONFIG_CFLAGS $C"
+-  PKGCONFIG_LIBS="$PKGCONFIG_LIBS $L"
++  PKGCONFIG_CFLAGS="$PKGCONFIG_CFLAGS $PCRE_CFLAGS"
++  PKGCONFIG_LIBS="$PKGCONFIG_LIBS $PCRE_LIBS"
+   unset C
+   unset L
+ fi
