@@ -1,0 +1,175 @@
+Index: sane-backends-9999/backend/pixma/pixma_mp150.c
+===================================================================
+--- sane-backends-9999.orig/backend/pixma/pixma_mp150.c
++++ sane-backends-9999/backend/pixma/pixma_mp150.c
+@@ -601,6 +601,8 @@ abort_session (pixma_t * s)
+ {
+   mp150_t *mp = (mp150_t *) s->subdriver;
+   mp->adf_state = state_idle;           /* reset adf scanning */
++  PDBG (pixma_dbg (1, "Scan abort session location 1"));
++
+   return pixma_exec_short_cmd (s, &mp->cb, cmd_abort_session);
+ }
+ 
+@@ -1322,6 +1324,8 @@ mp150_open (pixma_t * s)
+ 
+   /* adf scanning */
+   mp->adf_state = state_idle;
++  PDBG (pixma_dbg (1, "Scan abort session location 2"));
++
+ 
+   if (mp->generation < 4)
+     {
+@@ -1456,12 +1460,16 @@ mp150_scan (pixma_t * s)
+   int error = 0, tmo;
+   mp150_t *mp = (mp150_t *) s->subdriver;
+ 
++  PDBG (pixma_dbg (1, "mp150_scan()"));
+   if (mp->state != state_idle)
+     return PIXMA_EBUSY;
+ 
+   /* no paper inserted after first adf page => abort session */
+   if (s->param->adf_pageid && is_scanning_from_adf(s) && mp->adf_state == state_idle)
+   {
++      PDBG (pixma_dbg
++                  (1, "Scan abort location 1. adf_pageid=%u is_scanning_from_adf(s)=%d mp->adf_stat=%u.\n",
++		   s->param->adf_pageid, is_scanning_from_adf(s), (unsigned)mp->adf_state));
+     return PIXMA_ENO_PAPER;
+   }
+ 
+@@ -1475,14 +1483,19 @@ mp150_scan (pixma_t * s)
+         return PIXMA_EPROTO;
+     }
+ 
++  PDBG (pixma_dbg (1, "mp150_scan() interrupt"));
+   /* clear interrupt packets buffer */
+   while (handle_interrupt (s, 0) > 0)
+     {
+     }
+ 
++
+   /* FIXME: Duplex ADF: check paper status only before odd pages (1,3,5,...). */
++  PDBG (pixma_dbg (1, "mp150_scan() is adf?"));
+   if (is_scanning_from_adf (s))
+     {
++      PDBG (pixma_dbg (1, "mp150_scan() is adf scanning"));
++
+       if ((error = query_status (s)) < 0)
+         return error;
+ 
+@@ -1497,9 +1510,12 @@ mp150_scan (pixma_t * s)
+           PDBG (pixma_dbg
+             (2, "No paper in ADF. Timed out in %d sec.\n", tmo));
+         }
++      PDBG (pixma_dbg (1, "mp150_scan() is adf scanning"));
++
+ 
+       /* no paper inserted
+        * => abort session */
++      PDBG (pixma_dbg (1, "mp150_scan() has paper?"));
+       if (!has_paper (s))
+       {
+         PDBG (pixma_dbg (4, "*mp150_scan***** no paper in ADF *****\n"));
+@@ -1515,10 +1531,15 @@ mp150_scan (pixma_t * s)
+             return PIXMA_EPROTO;
+         }
+ 
++        PDBG (pixma_dbg
++                    (1, "Scan abort location 2"));
++
+         return PIXMA_ENO_PAPER;
+       }
+     }
+ 
++  PDBG (pixma_dbg (1, "mp150_scan() is idle?"));
++
+   tmo = 10;
+   /* adf: first page or idle */
+   if (mp->generation <= 2 || mp->adf_state == state_idle)
+@@ -1561,7 +1582,7 @@ mp150_scan (pixma_t * s)
+     }
+   else   /* ADF pageid != 0 and gen3 or above */
+   { /* next sheet from ADF */
+-    PDBG (pixma_dbg (4, "*mp150_scan***** scan next sheet from ADF  *****\n"));
++    PDBG (pixma_dbg (1, "*mp150_scan***** scan next sheet from ADF  *****\n"));
+     pixma_sleep (1000000);
+   }
+   if ((error >= 0) || (mp->generation >= 3))
+@@ -1579,7 +1600,12 @@ mp150_scan (pixma_t * s)
+ 
+   /* ADF scanning active */
+   if (is_scanning_from_adf (s))
+-    mp->adf_state = state_scanning;
++    {
++      mp->adf_state = state_scanning;
++      PDBG (pixma_dbg (1, "Scan abort session location 3"));
++    }
++  PDBG (pixma_dbg (1, "mp150_scan() normal exit"));
++
+   return 0;
+ }
+ 
+@@ -1591,6 +1617,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+   unsigned block_size, bytes_received, proc_buf_size, line_size;
+   uint8_t header[16];
+ 
++  PDBG (pixma_dbg (1, "mp150_fill_buffer() enter"));
++
+   if (mp->state == state_warmup)
+     {
+       RET_IF_ERR (wait_until_ready (s));
+@@ -1610,6 +1638,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+       mp->data_left_len = 0;
+     }
+ 
++  PDBG (pixma_dbg (1, "mp150_fill_buffer() loop"));
++
+   do
+     {
+       if (s->cancel)
+@@ -1625,6 +1655,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+         }
+       /*PDBG (pixma_dbg (4, "*mp150_fill_buffer***** moving %u bytes into buffer *****\n", mp->data_left_len));*/
+       memmove (mp->imgbuf, mp->data_left_ofs, mp->data_left_len);
++      PDBG (pixma_dbg (1, "mp150_fill_buffer() read"));
++
+       error = read_image_block (s, header, mp->imgbuf + mp->data_left_len);
+       if (error < 0)
+         {
+@@ -1638,6 +1670,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+           return error;
+         }
+ 
++      PDBG (pixma_dbg (1, "mp150_fill_buffer() analyse header"));
++
+       bytes_received = error;
+       /*PDBG (pixma_dbg (4, "*mp150_fill_buffer***** %u bytes received by read_image_block *****\n", bytes_received));*/
+       block_size = pixma_get_be32 (header + 12);
+@@ -1660,6 +1694,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+     }
+   while (ib->rend == ib->rptr);
+ 
++  PDBG (pixma_dbg (1, "mp150_fill_buffer() normal exit"));
++
+   return ib->rend - ib->rptr;
+ }
+ 
+@@ -1669,6 +1705,8 @@ mp150_finish_scan (pixma_t * s)
+   int error;
+   mp150_t *mp = (mp150_t *) s->subdriver;
+ 
++  PDBG (pixma_dbg (1, "mp150_finish_scan() enter"));
++
+   switch (mp->state)
+     {
+     case state_transfering:
+@@ -1701,6 +1739,9 @@ mp150_finish_scan (pixma_t * s)
+     case state_idle:
+       break;
+     }
++
++  PDBG (pixma_dbg (1, "mp150_finish_scan() normal exit"));
++
+ }
+ 
+ static void
