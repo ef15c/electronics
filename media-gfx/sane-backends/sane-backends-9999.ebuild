@@ -199,7 +199,7 @@ MULTILIB_CHOST_TOOLS=(
 src_prepare() {
 	default
 
-	echo "${PV}" > .tarball-version || die
+	echo "${PV}" > .version || die
 	eautoreconf
 
 	# Needed for udev rules generation/installation
