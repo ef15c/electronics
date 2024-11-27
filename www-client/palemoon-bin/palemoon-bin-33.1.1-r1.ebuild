@@ -19,7 +19,8 @@ SLOT="0"
 KEYWORDS="~arm"
 
 DEPEND=""
-RDEPEND="x11-libs/gtk+:3"
+RDEPEND="x11-libs/gtk+:2\
+	x11-libs/gtk+:3"
 BDEPEND="app-alternatives/gzip"
 
 src_unpack() {
