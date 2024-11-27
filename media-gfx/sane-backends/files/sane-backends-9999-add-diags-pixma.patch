@@ -11,7 +11,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    return pixma_exec_short_cmd (s, &mp->cb, cmd_abort_session);
  }
  
-@@ -1322,6 +1324,8 @@ mp150_open (pixma_t * s)
+@@ -1322,12 +1324,16 @@ mp150_open (pixma_t * s)
  
    /* adf scanning */
    mp->adf_state = state_idle;
@@ -20,11 +20,47 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
  
    if (mp->generation < 4)
      {
-@@ -1456,12 +1460,16 @@ mp150_scan (pixma_t * s)
+       query_status (s);
+       handle_interrupt (s, 200);
+     }
++  PDBG (pixma_dbg (1, "point 25: adf_state=%u\n", mp->adf_state));
++
+   return 0;
+ }
+ 
+@@ -1335,6 +1341,8 @@ static void
+ mp150_close (pixma_t * s)
+ {
+   mp150_t *mp = (mp150_t *) s->subdriver;
++  PDBG (pixma_dbg (1, "point 24: adf_state=%u\n", mp->adf_state));
++
+ 
+   mp150_finish_scan (s);
+   free (mp->cb.buf);
+@@ -1346,6 +1354,8 @@ static int
+ mp150_check_param (pixma_t * s, pixma_scan_param_t * sp)
+ {
+   mp150_t *mp = (mp150_t *) s->subdriver;
++  PDBG (pixma_dbg (1, "point 22: adf_state=%u\n", mp->adf_state));
++
+ 
+   /* PDBG (pixma_dbg (4, "*mp150_check_param***** Initially: channels=%u, depth=%u, x=%u, y=%u, w=%u, h=%u, xs=%u, wx=%u, gamma=%f *****\n",
+                    sp->channels, sp->depth, sp->x, sp->y, sp->w, sp->h, sp->xs, sp->wx, sp->gamma)); */
+@@ -1447,6 +1457,8 @@ mp150_check_param (pixma_t * s, pixma_sc
+ 
+   /*PDBG (pixma_dbg (4, "*mp150_check_param***** Finally: channels=%u, depth=%u, x=%u, y=%u, w=%u, h=%u, xs=%u, wx=%u *****\n",
+                    sp->channels, sp->depth, sp->x, sp->y, sp->w, sp->h, sp->xs, sp->wx));*/
++  PDBG (pixma_dbg (1, "point 23: adf_state=%u\n", mp->adf_state));
++
+   return 0;
+ }
+ 
+@@ -1456,12 +1468,17 @@ mp150_scan (pixma_t * s)
    int error = 0, tmo;
    mp150_t *mp = (mp150_t *) s->subdriver;
  
 +  PDBG (pixma_dbg (1, "mp150_scan()"));
++  PDBG (pixma_dbg (1, "point 15: adf_state=%u\n", mp->adf_state));
    if (mp->state != state_idle)
      return PIXMA_EBUSY;
  
@@ -37,7 +73,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
      return PIXMA_ENO_PAPER;
    }
  
-@@ -1475,14 +1483,23 @@ mp150_scan (pixma_t * s)
+@@ -1475,14 +1492,23 @@ mp150_scan (pixma_t * s)
          return PIXMA_EPROTO;
      }
  
@@ -61,7 +97,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        if ((error = query_status (s)) < 0)
          return error;
  
-@@ -1497,9 +1514,12 @@ mp150_scan (pixma_t * s)
+@@ -1497,9 +1523,12 @@ mp150_scan (pixma_t * s)
            PDBG (pixma_dbg
              (2, "No paper in ADF. Timed out in %d sec.\n", tmo));
          }
@@ -74,7 +110,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        if (!has_paper (s))
        {
          PDBG (pixma_dbg (4, "*mp150_scan***** no paper in ADF *****\n"));
-@@ -1515,16 +1535,25 @@ mp150_scan (pixma_t * s)
+@@ -1515,16 +1544,25 @@ mp150_scan (pixma_t * s)
              return PIXMA_EPROTO;
          }
  
@@ -100,7 +136,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        while (error == PIXMA_EBUSY && --tmo >= 0)
          {
            if (s->cancel)
-@@ -1537,6 +1566,8 @@ mp150_scan (pixma_t * s)
+@@ -1537,6 +1575,8 @@ mp150_scan (pixma_t * s)
            pixma_sleep (1000000);
            error = start_session (s);
          }
@@ -109,7 +145,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        if (error == PIXMA_EBUSY || error == PIXMA_ETIMEDOUT)
          {
            /* The scanner maybe hangs. We try to empty output buffer of the
-@@ -1561,9 +1592,11 @@ mp150_scan (pixma_t * s)
+@@ -1561,9 +1601,11 @@ mp150_scan (pixma_t * s)
      }
    else   /* ADF pageid != 0 and gen3 or above */
    { /* next sheet from ADF */
@@ -122,7 +158,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    if ((error >= 0) || (mp->generation >= 3))
      mp->state = state_warmup;
    if (error >= 0)
-@@ -1579,7 +1612,14 @@ mp150_scan (pixma_t * s)
+@@ -1579,7 +1621,14 @@ mp150_scan (pixma_t * s)
  
    /* ADF scanning active */
    if (is_scanning_from_adf (s))
@@ -138,7 +174,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    return 0;
  }
  
-@@ -1591,6 +1631,9 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+@@ -1591,6 +1640,9 @@ mp150_fill_buffer (pixma_t * s, pixma_im
    unsigned block_size, bytes_received, proc_buf_size, line_size;
    uint8_t header[16];
  
@@ -148,7 +184,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    if (mp->state == state_warmup)
      {
        RET_IF_ERR (wait_until_ready (s));
-@@ -1610,6 +1653,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+@@ -1610,6 +1662,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
        mp->data_left_len = 0;
      }
  
@@ -159,7 +195,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    do
      {
        if (s->cancel)
-@@ -1625,6 +1672,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+@@ -1625,6 +1681,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
          }
        /*PDBG (pixma_dbg (4, "*mp150_fill_buffer***** moving %u bytes into buffer *****\n", mp->data_left_len));*/
        memmove (mp->imgbuf, mp->data_left_ofs, mp->data_left_len);
@@ -170,7 +206,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        error = read_image_block (s, header, mp->imgbuf + mp->data_left_len);
        if (error < 0)
          {
-@@ -1638,6 +1689,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+@@ -1638,6 +1698,8 @@ mp150_fill_buffer (pixma_t * s, pixma_im
            return error;
          }
  
@@ -179,7 +215,7 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
        bytes_received = error;
        /*PDBG (pixma_dbg (4, "*mp150_fill_buffer***** %u bytes received by read_image_block *****\n", bytes_received));*/
        block_size = pixma_get_be32 (header + 12);
-@@ -1660,6 +1713,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
+@@ -1660,6 +1722,10 @@ mp150_fill_buffer (pixma_t * s, pixma_im
      }
    while (ib->rend == ib->rptr);
  
@@ -190,20 +226,57 @@ Index: sane-backends-9999/backend/pixma/pixma_mp150.c
    return ib->rend - ib->rptr;
  }
  
-@@ -1669,6 +1726,8 @@ mp150_finish_scan (pixma_t * s)
+@@ -1669,9 +1735,14 @@ mp150_finish_scan (pixma_t * s)
    int error;
    mp150_t *mp = (mp150_t *) s->subdriver;
  
++  PDBG (pixma_dbg (1, "point 16: adf_state=%u\n", mp->adf_state));
++
 +  PDBG (pixma_dbg (1, "mp150_finish_scan() enter"));
 +
    switch (mp->state)
      {
      case state_transfering:
-@@ -1701,6 +1760,9 @@ mp150_finish_scan (pixma_t * s)
++      PDBG (pixma_dbg (1, "point 17: adf_state=%u\n", mp->adf_state));
+       drain_bulk_in (s);
+       /* fall through */
+     case state_scanning:
+@@ -1679,14 +1750,18 @@ mp150_finish_scan (pixma_t * s)
+     case state_finished:
+       /* FIXME: to process several pages ADF scan, must not send
+        * abort_session and start_session between pages (last_block=0x28) */
++      PDBG (pixma_dbg (1, "point 18: adf_state=%u\n", mp->adf_state));
+       if (mp->generation <= 2 || !is_scanning_from_adf (s) || mp->last_block == 0x38)
+         {
++	  PDBG (pixma_dbg (1, "point 18: adf_state=%u\n", mp->adf_state));
++
+           PDBG (pixma_dbg (4, "*mp150_finish_scan***** abort session  *****\n"));
+           error = abort_session (s);  /* FIXME: it probably doesn't work in duplex mode! */
+           if (error < 0)
+             PDBG (pixma_dbg (1, "WARNING:abort_session() failed %d\n", error));
+ 
+           /* Generation 4+: send XML end of scan dialog */
++          PDBG (pixma_dbg (1, "point 19: adf_state=%u\n", mp->adf_state));
+           if (mp->generation >= 4)
+             {
+               if (!send_xml_dialog (s, XML_END))
+@@ -1694,13 +1769,20 @@ mp150_finish_scan (pixma_t * s)
+             }
+         }
+       else
+-        PDBG (pixma_dbg (4, "*mp150_finish_scan***** wait for next page from ADF  *****\n"));
++	{
++	  PDBG (pixma_dbg (4, "*mp150_finish_scan***** wait for next page from ADF  *****\n"));
++	      PDBG (pixma_dbg (1, "point 20: adf_state=%u\n", mp->adf_state));
+ 
++	}
+       mp->state = state_idle;
+       /* fall through */
      case state_idle:
        break;
      }
 +
++	      PDBG (pixma_dbg (1, "point 21: adf_state=%u\n", mp->adf_state));
 +  PDBG (pixma_dbg (1, "mp150_finish_scan() normal exit"));
 +
  }
