@@ -1,7 +1,7 @@
-Index: work/mysql/tests/mysql_client_fw.c
+Index: mysql/tests/mysql_client_fw.c
 ===================================================================
---- work.orig/mysql/tests/mysql_client_fw.c
-+++ work/mysql/tests/mysql_client_fw.c
+--- mysql.orig/tests/mysql_client_fw.c
++++ mysql/tests/mysql_client_fw.c
 @@ -1430,14 +1430,6 @@ int main(int argc, char **argv)
      tests_to_run[i]= NULL;
    }
