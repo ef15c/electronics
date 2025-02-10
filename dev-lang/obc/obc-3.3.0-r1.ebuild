@@ -3,6 +3,8 @@
 
 EAPI=8
 
+inherit autotools
+
 PMV=${PV%%\.*}
 DESCRIPTION="Oxford Oberon-2 Compiler"
 HOMEPAGE="https://spivey.oriel.ox.ac.uk/corner/Installing_OBC_release_3.1"
@@ -13,6 +15,7 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="dev-lang/ocaml \
+dev-ml/lablgtk-sourceview \
 x11-libs/gtksourceview:3.0"
 RDEPEND="${DEPEND}"
 BDEPEND=""
@@ -28,5 +31,5 @@ PATCHES=(
 
 src_prepare() {
 	default
-  autoreconf
+  eautoreconf
 }
