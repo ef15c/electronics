@@ -15,7 +15,6 @@ SLOT="0"
 KEYWORDS="~amd64"
 
 DEPEND="dev-lang/ocaml \
-dev-ml/lablgtk-sourceview \
 x11-libs/gtksourceview:3.0"
 RDEPEND="${DEPEND}"
 BDEPEND=""
@@ -27,6 +26,7 @@ RESTRICT="strip"
 PATCHES=(
 	"$FILESDIR/${P}-0000-fix-install-path.patch"
 	"$FILESDIR/${P}-to-BYTE-bug-fix.patch"
+	"$FILESDIR/${P}-fix-lablgtk-race-condition.patch"
 )
 
 src_prepare() {

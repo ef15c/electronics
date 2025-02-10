@@ -1,0 +1,12 @@
+Index: obc-3-rel-3.3.0/lablgtk3/lablgen/Makefile
+===================================================================
+--- obc-3-rel-3.3.0.orig/lablgtk3/lablgen/Makefile
++++ obc-3-rel-3.3.0/lablgtk3/lablgen/Makefile
+@@ -15,6 +15,7 @@ propcc varcc: %: myStream.cmo myGenlex.c
+ 
+ propcc.cmo varcc.cmo myGenlex.cmo: myGenlex.cmi myStream.cmi
+ myStream.cmo: myStream.cmi
++myGenlex.cmi: myStream.cmi
+ 
+ %.cmi: %.mli
+ 	$(OCAMLC) -c $< -o $@ 
