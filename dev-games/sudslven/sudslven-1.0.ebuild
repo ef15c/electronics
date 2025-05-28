@@ -5,7 +5,7 @@ EAPI=8
 
 DESCRIPTION="Library for solving Sudoku puzzles"
 HOMEPAGE="https://github.com/ef15c/Sudoku"
-SRC_URI="https://github.com/ef15c/Sudoku/releases/download/v1/${P}.tar.gz"
+SRC_URI="https://github.com/ef15c/Sudoku/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
