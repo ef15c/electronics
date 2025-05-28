@@ -1,4 +1,4 @@
-# Copyright 2025 Gentoo Authors
+# Copyright 2025 Christian Schoffit
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -27,16 +27,6 @@ src_configure() {
 src_install() {
 	emake INSTALL_ROOT="${D}" install
 	doicon images/sudoku.png
-	make_desktop_entry /usr/bin/SudokuInterfaceQt Sudoku /usr/share/pixmap/sudoku.png Game
-}
-
-pkg_postinst() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
-}
-
-pkg_postrm() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
+	make_desktop_entry /usr/bin/SudokuInterfaceQt Sudoku /usr/share/pixmaps/sudoku.png Game
 }
 
