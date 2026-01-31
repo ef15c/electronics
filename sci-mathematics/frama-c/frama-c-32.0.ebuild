@@ -15,6 +15,7 @@ RDEPEND="${DEPEND}
 	dev-ml/opam
 	media-gfx/graphviz
 	x11-libs/gtksourceview:3.0
+	x11-libs/gtksourceview:2.0
 	gnome-base/libgnomecanvas"
 BDEPEND=""
 
