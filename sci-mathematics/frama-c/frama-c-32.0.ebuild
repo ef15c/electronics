@@ -18,8 +18,10 @@ RDEPEND="${DEPEND}
 	x11-libs/gtksourceview:3.0
 	x11-libs/gtksourceview:2.0
 	gnome-base/libgnomecanvas
-	net-libs/nodejs[ivette?]
-	sys-apps/yarn[ivette?]"
+	ivette? (
+		net-libs/nodejs
+		sys-apps/yarn
+	)"
 BDEPEND=""
 
 pkg_postinst() {
