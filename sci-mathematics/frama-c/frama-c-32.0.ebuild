@@ -8,6 +8,7 @@ HOMEPAGE="https://frama-c.com"
 
 LICENSE="BSD LGPL-2 LGPL-2.1"
 SLOT="0"
+IUSE="+ivette"
 KEYWORDS="amd64"
 
 DEPEND=""
@@ -16,7 +17,9 @@ RDEPEND="${DEPEND}
 	media-gfx/graphviz
 	x11-libs/gtksourceview:3.0
 	x11-libs/gtksourceview:2.0
-	gnome-base/libgnomecanvas"
+	gnome-base/libgnomecanvas
+	net-libs/nodejs[ivette?]
+	sys-apps/yarn[ivette?]"
 BDEPEND=""
 
 pkg_postinst() {
