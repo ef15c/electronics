@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit cmake
+inherit cmake udev
 
 DESCRIPTION="I2C, MicroWire and SPI EEPROM/Flash chip Programmer"
 HOMEPAGE="https://github.com/bigbigmdm/IMSProg"
@@ -24,6 +24,23 @@ BDEPEND="
 	dev-qt/linguist-tools
 	dev-util/pkgconf
 	sys-apps/systemd-utils
+	app-arch/gzip
 "
 
 S=${WORKDIR}/IMSProg-${PV}
+
+src_install() {
+	cmake_src_install
+	mv ${D}/usr/share/doc/imsprog/* ${D}/usr/share/doc/imsprog-${PV}
+	rmdir ${D}/usr/share/doc/imsprog || die "/usr/share/doc/imsprog not empty"
+	gunzip ${D}/usr/share/man/man1/*
+}
+
+pkg_postrm() {
+	udev_reload
+}
+
+pkg_postinst() {
+	udev_reload
+}
+
