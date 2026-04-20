@@ -7,7 +7,8 @@ inherit cmake udev
 
 DESCRIPTION="I2C, MicroWire and SPI EEPROM/Flash chip Programmer"
 HOMEPAGE="https://github.com/bigbigmdm/IMSProg"
-SRC_URI="https://github.com/bigbigmdm/IMSProg/archive/refs/tags/v${PV}.tar.gz"
+SRC_URI="https://github.com/bigbigmdm/IMSProg/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+S=${WORKDIR}/IMSProg-${PV}
 
 LICENSE="GPL-3"
 SLOT="0"
@@ -27,13 +28,11 @@ BDEPEND="
 	app-arch/gzip
 "
 
-S=${WORKDIR}/IMSProg-${PV}
-
 src_install() {
 	cmake_src_install
-	mv ${D}/usr/share/doc/imsprog/* ${D}/usr/share/doc/imsprog-${PV}
-	rmdir ${D}/usr/share/doc/imsprog || die "/usr/share/doc/imsprog not empty"
-	gunzip ${D}/usr/share/man/man1/*
+	mv "${D}"/usr/share/doc/imsprog/* "${D}"/usr/share/doc/imsprog-${PV}
+	rmdir "${D}"/usr/share/doc/imsprog || die "/usr/share/doc/imsprog not empty"
+	gunzip "${D}"/usr/share/man/man1/*
 }
 
 pkg_postrm() {
@@ -43,4 +42,3 @@ pkg_postrm() {
 pkg_postinst() {
 	udev_reload
 }
-
