@@ -1,0 +1,12 @@
+Index: cnijfilter-source-4.00-1/backend/src/cnij_backend_common.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/backend/src/cnij_backend_common.c	2026-04-21 16:20:54.908362079 +0200
++++ cnijfilter-source-4.00-1/backend/src/cnij_backend_common.c	2026-04-21 16:22:04.747191091 +0200
+@@ -38,6 +38,7 @@
+ // CUPS Header
+ #include <cups/cups.h>
+ #include <cups/ipp.h>
++#include <cups/ppd.h>
+ 
+ // Header file for CANON
+ #include "cnij_backend_common.h"

@@ -1,0 +1,108 @@
+Index: cnijfilter-source-4.00-1/cnijfilter/src/bjfilter.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cnijfilter/src/bjfilter.c	2026-04-21 16:20:39.910173648 +0200
++++ cnijfilter-source-4.00-1/cnijfilter/src/bjfilter.c	2026-04-21 16:23:26.554915570 +0200
+@@ -52,7 +52,7 @@
+ #include "bjfilter.h"
+ #include "uitypes.h"
+ #include "bjfpath.h"
+-
++#include <ctype.h>
+ 
+ /* function prototypes */
+ extern short GetIPCData(LPIPCU pipc, char *sname);
+Index: cnijfilter-source-4.00-1/cnijfilter/src/bjfimage.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cnijfilter/src/bjfimage.c	2026-04-21 16:20:39.910761170 +0200
++++ cnijfilter-source-4.00-1/cnijfilter/src/bjfimage.c	2026-04-21 16:23:26.556429895 +0200
+@@ -27,6 +27,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
+ 
+ #include "cpktypes.h"
+ #include "cncl.h"
+Index: cnijfilter-source-4.00-1/cnijfilter/src/bjfoption.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cnijfilter/src/bjfoption.c	2026-04-21 16:20:39.911298952 +0200
++++ cnijfilter-source-4.00-1/cnijfilter/src/bjfoption.c	2026-04-21 16:23:26.556914471 +0200
+@@ -43,6 +43,7 @@
+ #include "psize.h"
+ #include "bjfversion.h"
+ #include "bjfpath.h"
++#include <ctype.h>
+ 
+ short SetCmdOption(int, char **, LPBJF_OPTINFO, LPBJFLTCOLORSYSTEM, LPBJFLTDEVICE, LPCNCLPAPERSIZE, char *, char *, char *);
+ static void usage( char * );
+Index: cnijfilter-source-4.00-1/cnijfilter/src/getipc.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cnijfilter/src/getipc.c	2026-04-21 16:20:39.911800365 +0200
++++ cnijfilter-source-4.00-1/cnijfilter/src/getipc.c	2026-04-21 16:23:26.557349997 +0200
+@@ -43,7 +43,7 @@
+ 	struct sockaddr_un		sun;
+ 	int						s, c;
+ 	char					buf[128];
+-	size_t					adrlen;
++	socklen_t					adrlen;
+ 	short					ret = RET_ERROR;
+ 
+ 	if ((s = socket(PF_UNIX, SOCK_STREAM, 0)) < 0)
+Index: cnijfilter-source-4.00-1/cnijfilter/src/bjfpos.h
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cnijfilter/src/bjfpos.h	2026-04-21 16:20:39.912075313 +0200
++++ cnijfilter-source-4.00-1/cnijfilter/src/bjfpos.h	2026-04-21 16:23:26.557574037 +0200
+@@ -84,6 +84,7 @@
+ extern void bjf_pos_img_init( LPBJF_POS_IMGINFO lpimginfo );
+ extern void bjf_pos_prn_init( LPBJF_POS_PRNINFO lpprninfo );
+ extern void bjf_pos_init( LPBJF_POSINFO lpposinfo );
++extern void bjf_margin_init( LPBJF_MARGIN_INFO );
+ extern short bjf_pos_imageresolution( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO );
+ extern short bjf_pos_imageresolution_fit( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO );
+ extern short bjf_pos_imageresolution_center( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO );
+@@ -113,6 +114,7 @@
+ extern short bjf_pos_set_prnwidth( LPBJF_POS_PRNINFO, long );
+ extern short bjf_pos_set_prnheight( LPBJF_POS_PRNINFO, long );
+ 
++extern short SetExtLevel( LPBJF_MARGIN_INFO, short);
+ extern short SetImageSize( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO);
+ extern short ImageFitShort( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO, LPBJF_MARGIN_INFO );
+ extern short ImageFitLong( LPBJF_POS_IMGINFO, LPBJF_POS_PRNINFO, LPBJF_POSINFO, LPBJF_MARGIN_INFO );
+Index: cnijfilter-source-4.00-1/lgmon2/src/keytext.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/lgmon2/src/keytext.c	2026-04-21 16:20:39.912389623 +0200
++++ cnijfilter-source-4.00-1/lgmon2/src/keytext.c	2026-04-21 16:23:26.557844599 +0200
+@@ -38,6 +38,7 @@
+ #include <unistd.h>
+ #include <libxml/parser.h>	/* Ver.2.80 */
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #include "keytext.h"
+ 
+Index: cnijfilter-source-4.00-1/cngpij/cngpij/getipc.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cngpij/cngpij/getipc.c	2026-04-21 16:22:00.729225227 +0200
++++ cnijfilter-source-4.00-1/cngpij/cngpij/getipc.c	2026-04-21 16:23:26.558205605 +0200
+@@ -40,7 +40,7 @@
+ 	int server_fd;
+ 	int client_fd;
+ 	char buf[128];
+-	size_t len;
++	socklen_t len;
+ 	short ret = RET_ERROR;
+ 
+ 	if( (server_fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0 )
+Index: cnijfilter-source-4.00-1/cngpijmnt/src/getipc.c
+===================================================================
+--- cnijfilter-source-4.00-1.orig/cngpijmnt/src/getipc.c	2026-04-21 16:28:23.195351844 +0200
++++ cnijfilter-source-4.00-1/cngpijmnt/src/getipc.c	2026-04-21 16:40:00.239645681 +0200
+@@ -42,7 +42,7 @@
+ 	int server_fd;
+ 	int client_fd;
+ 	char buf[128];
+-	size_t len;
++	socklen_t len;
+ 	short ret = RET_ERROR;
+ 
+ 	if( (server_fd = socket(PF_UNIX, SOCK_STREAM, 0)) < 0 )
