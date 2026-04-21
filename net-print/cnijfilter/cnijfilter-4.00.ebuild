@@ -65,4 +65,7 @@ src_install() {
 	insinto /usr/share/ppd/cupsfilters
 	doins ppd/*ppd
 	dolib.so ${LIBDIR}/*
+	mkdir -p "${D}"/usr/libexec/cups || die
+	mv "${D}"/usr/lib64/cups/filter "${D}"/usr/libexec/cups || die
+	rmdir "${D}"/usr/lib64/cups || die
 }
