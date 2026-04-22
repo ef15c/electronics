@@ -34,6 +34,7 @@ src_prepare() {
 	DIRS="libs cngpij cngpijmnt pstocanonij backend backendnet cmdtocanonij cnijbe lgmon2"
 # bscc2sts cnijnpr
 	LIBDIR=com/libs_bin$(usex amd64 64 32)
+	LIBDIR427=427/libs_bin$(usex amd64 64 32)
 	for d in ${DIRS}; do
 		mv "${d}"/configure.{in,ac} || die
 	done
@@ -48,11 +49,20 @@ src_prepare() {
 		*/configure.ac \
 		cnijbe/src/Makefile.am || die
 	eautoreconf
-	cd ${LIBDIR}
+	cd ${LIBDIR} || die
 	rm libcn*.so || die
 	ln -sf libcnbpcnclapicom.so.4.0.0 libcnbpcnclapicom.so || die
 	ln -sf libcnnet.so.1.2.2 libcnnet.so || die
+	cd -
 
+	cd ${LIBDIR427} || die
+	rm libcn*.so || die
+	ln -sf libcnbpcmcm427.so.8.20.1 libcnbpcmcm427.so || die
+	ln -sf libcnbpcnclapi427.so.4.0.0 libcnbpcnclapi427.so || die
+	ln -sf libcnbpcnclbjcmd427.so.3.3.0 libcnbpcnclbjcmd427.so || die
+	ln -sf libcnbpcnclui427.so.4.0.0 libcnbpcnclui427.so || die
+	ln -sf libcnbpess427.so.4.3.1 libcnbpess427.so || die
+	ln -sf libcnbpo427.so.1.0.4 libcnbpo427.so|| die
 	cd -
 }
 
