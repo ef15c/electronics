@@ -24,10 +24,7 @@ BDEPEND="
 	dev-build/cmake
 	dev-qt/linguist-tools
 	dev-util/pkgconf
-	|| (
-		sys-apps/systemd
-		sys-apps/systemd-utils
-	)
+	virtual/udev
 	app-arch/gzip
 "
 
