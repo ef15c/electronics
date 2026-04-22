@@ -68,4 +68,9 @@ src_install() {
 	mkdir -p "${D}"/usr/libexec/cups || die
 	mv "${D}"/usr/lib64/cups/filter "${D}"/usr/libexec/cups || die
 	rmdir "${D}"/usr/lib64/cups || die
+	mv "${D}"/usr/lib/cups/backend "${D}"/usr/libexec/cups || die
+	rmdir "${D}"/usr/lib/cups || die
+	dolib.so 427/libs_bin$(usex amd64 64 32)/*
+	insinto /usr/lib64/bjlib
+	doins 427/database/*
 }
