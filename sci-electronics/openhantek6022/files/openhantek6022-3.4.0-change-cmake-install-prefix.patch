@@ -1,0 +1,15 @@
+Index: OpenHantek6022-3.4.0/CMakeLists.txt
+===================================================================
+--- OpenHantek6022-3.4.0.orig/CMakeLists.txt	2025-03-19 14:52:48.000000000 +0100
++++ OpenHantek6022-3.4.0/CMakeLists.txt	2026-04-26 13:04:06.441028549 +0200
+@@ -48,6 +48,10 @@
+ 
+ message(STATUS "PACKAGE_VERSION: ${PACKAGE_VERSION}")
+ 
++IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
++  SET(CMAKE_INSTALL_PREFIX "/usr" CACHE PATH "nothing" FORCE)
++ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
++
+ set(OpenGL_GL_PREFERENCE GLVND)
+ 
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
