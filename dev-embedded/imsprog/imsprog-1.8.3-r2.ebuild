@@ -16,7 +16,7 @@ KEYWORDS="~amd64"
 
 DEPEND="
 	dev-libs/libusb
-	dev-qt/qtcode
+	dev-qt/qtcore
 	dev-qt/qtgui
 	dev-qt/qtwidgets
 	dev-qt/qtnetwork
