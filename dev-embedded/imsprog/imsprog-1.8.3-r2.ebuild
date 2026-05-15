@@ -21,12 +21,13 @@ DEPEND="
 	dev-qt/qtwidgets
 	dev-qt/qtnetwork
 "
-RDEPEND="${DEPEND}"
+RDEPEND="${DEPEND}
+	virtual/udev
+"
 BDEPEND="
 	dev-build/cmake
 	dev-qt/linguist-tools
 	dev-util/pkgconf
-	virtual/udev
 	app-arch/gzip
 "
 
